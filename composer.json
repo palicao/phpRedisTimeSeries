@@ -1,0 +1,17 @@
+{
+    "name": "palicao/php-redis-time-series",
+    "authors": [
+        {
+            "name": "Alessandro Balasco",
+            "email": "alessandro.balasco@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Palicao\\PhpRedisTimeSeries\\": "src"
+        }
+    },
+    "require": {
+        "ext-redis": "*"
+    }
+}

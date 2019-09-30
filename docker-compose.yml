@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  php:
+    container_name: php
+    build:
+      dockerfile: Dockerfile
+      context: .
+    entrypoint: sleep infinity
+    volumes:
+      - .:/app
+  redis:
+    container_name: redis
+    image: redislabs/redistimeseries:1.0.3

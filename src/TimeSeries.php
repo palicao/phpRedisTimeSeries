@@ -206,8 +206,8 @@ class TimeSeries
         ?AggregationRule $rule = null
     ): array
     {
-        $fromTs = $from ? $from->format('Uu') : '-';
-        $toTs = $to ? $to->format('Uu') : '+';
+        $fromTs = $from ? (int) $from->format('Uu') / 1000 : '-';
+        $toTs = $to ? (int) $to->format('Uu') / 1000 : '+';
 
         $params = ['TS.RANGE', $key, $fromTs, $toTs];
         if ($count !== null) {
@@ -242,8 +242,8 @@ class TimeSeries
         ?AggregationRule $rule = null
     ) : array
     {
-        $fromTs = $from ? $from->format('Uu') : '-';
-        $toTs = $to ? $to->format('Uu') : '+';
+        $fromTs = $from ? (int) $from->format('Uu') / 1000 : '-';
+        $toTs = $to ? (int) $to->format('Uu') / 1000 : '+';
 
         $params = ['TS.MRANGE', $fromTs, $toTs];
         if ($count !== null) {
@@ -279,6 +279,22 @@ class TimeSeries
         return Sample::createFromTimestamp($key, (float) $result[1], (int) $result[0]);
     }
 
+    /**
+     * @param Filter $filter
+     * @return array
+     * @throws RedisClientException
+     * @throws RedisException
+     */
+    public function getLastValues(Filter $filter) : array
+    {
+        $results = $this->redis->executeCommand(['TS.MGET', 'FILTER', $filter->toRedisParams()]);
+        $samples = [];
+        foreach ($results as $result) {
+            $samples[] = Sample::createFromTimestamp($result[0], (float) $result[3], (int) $result[2]);
+        }
+        return $samples;
+    }
+
     public function info(string $key) : Metadata
     {
         $res = $this->redis->executeCommand(['TS.INFO', $key]);
@@ -296,22 +312,6 @@ class TimeSeries
         }
 
         return Metadata::fromRedis($res[1], $res[3], $res[5], $res[7], $labels, $sourceKey, $rules);
-    }
-
-    /**
-     * @param Filter $filter
-     * @return array
-     * @throws RedisClientException
-     * @throws RedisException
-     */
-    public function getLastValues(Filter $filter) : array
-    {
-        $results = $this->redis->executeCommand(['TS.MGET', 'FILTER', $filter->toRedisParams()]);
-        $samples = [];
-        foreach ($results as $result) {
-            $samples[] = Sample::createFromTimestamp($result[0], (float) $result[3], (int) $result[2]);
-        }
-        return $samples;
     }
 
     private function getRetentionParams(?int $retentionMs = null) : array

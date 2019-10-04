@@ -11,7 +11,15 @@
             "Palicao\\PhpRedisTimeSeries\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Palicao\\PhpRedisTimeSeries\\Tests\\": "tests"
+        }
+    },
     "require": {
         "ext-redis": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.3"
     }
 }

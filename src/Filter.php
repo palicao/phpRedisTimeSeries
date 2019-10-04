@@ -32,7 +32,11 @@ class Filter
     public function add(string $label, int $operation, $value = null)
     {
         if (!in_array($operation, self::OPERATIONS, true)) {
-            throw new InvalidFilterOperationException(sprintf('Operation %s is not valid', $operation));
+            throw new InvalidFilterOperationException('Operation is not valid');
+        }
+
+        if (in_array($operation, [self::OP_EQUALS, self::OP_NOT_EQUALS], true) && !is_scalar($value)) {
+            throw new InvalidFilterOperationException('The provided operation requires the value to be scalar');
         }
 
         if (in_array($operation, [self::OP_EXISTS, self::OP_NOT_EXISTS], true) && $value !== null) {

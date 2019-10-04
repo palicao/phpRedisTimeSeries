@@ -111,7 +111,7 @@ class Metadata
     /**
      * @return string
      */
-    public function getSourceKey(): string
+    public function getSourceKey(): ?string
     {
         return $this->sourceKey;
     }

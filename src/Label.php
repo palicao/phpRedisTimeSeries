@@ -21,7 +21,7 @@ class Label
     }
 
     /**
-     * @return string
+     * @codeCoverageIgnore
      */
     public function getKey(): string
     {
@@ -29,7 +29,7 @@ class Label
     }
 
     /**
-     * @return string
+     * @codeCoverageIgnore
      */
     public function getValue(): string
     {

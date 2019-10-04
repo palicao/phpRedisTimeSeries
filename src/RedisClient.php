@@ -24,7 +24,6 @@ class RedisClient
      */
     private function connectIfNeeded(): void
     {
-        /** @noinspection PhpUndefinedMethodInspection */
         if ($this->redis->isConnected()) {
             return;
         }
@@ -51,7 +50,7 @@ class RedisClient
             );
         }
 
-        // UNDOCUMENTED FEATURE: see REDIS_OPT_REPLY_LITERAL
+        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
         $this->redis->setOption(8, true);
 
         if ($result === false) {

@@ -55,11 +55,17 @@ class AggregationRule
         $this->timeBucketMs = $timeBucketMs;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getType(): string
     {
         return $this->type;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getTimeBucketMs(): int
     {
         return $this->timeBucketMs;

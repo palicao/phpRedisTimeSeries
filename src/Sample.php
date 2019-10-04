@@ -52,17 +52,11 @@ class Sample
         if ($this->dateTime === null) {
             return '*';
         }
-        return round($this->dateTime->format('Uu') / 1000);
+        return (int) round($this->dateTime->format('Uu') / 1000);
     }
 
     public function toRedisParams() : array
     {
-        if ($this->dateTime === null) {
-            $timestamp = '*';
-        } else {
-            $timestamp = round($this->dateTime->format('Uu') / 1000);
-        }
-
-        return [$this->getKey(), $timestamp, $this->getValue()];
+        return [$this->getKey(), $this->getTimestampWithMs(), $this->getValue()];
     }
 }

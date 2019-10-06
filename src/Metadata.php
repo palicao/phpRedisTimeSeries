@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
@@ -22,7 +23,7 @@ class Metadata
     /** @var Label[] */
     private $labels;
 
-    /** @var string */
+    /** @var string|null */
     private $sourceKey;
 
     /** @var AggregationRule[] */
@@ -64,7 +65,7 @@ class Metadata
         array $rules = []
     ) : self
     {
-        $dateTime = DateTimeImmutable::createFromFormat('U.u', (string) $lastTimestamp / 1000);
+        $dateTime = DateTimeImmutable::createFromFormat('U.u', (string) ($lastTimestamp / 1000));
         return new self($dateTime, $retentionTime, $chunkCount, $maxSamplesPerChunk, $labels, $sourceKey, $rules);
     }
 
@@ -101,7 +102,7 @@ class Metadata
     }
 
     /**
-     * @return string[]
+     * @return Label[]
      */
     public function getLabels(): array
     {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
@@ -16,7 +17,7 @@ class RedisConnectionParams
     /** @var int */
     private $timeout;
 
-    /** @var float */
+    /** @var int */
     private $retryInterval;
 
     /** @var float */
@@ -28,8 +29,8 @@ class RedisConnectionParams
         $this->host = $host;
         $this->port = $port;
         $this->timeout = 0;
-        $this->retryInterval = 0.0;
-        $this->readTimeout = 0;
+        $this->retryInterval = 0;
+        $this->readTimeout = 0.0;
     }
 
     public function setPersistentConnection(bool $persistentConnection): RedisConnectionParams
@@ -44,7 +45,7 @@ class RedisConnectionParams
         return $this;
     }
 
-    public function setRetryInterval(float $retryInterval): RedisConnectionParams
+    public function setRetryInterval(int $retryInterval): RedisConnectionParams
     {
         $this->retryInterval = $retryInterval;
         return $this;
@@ -76,7 +77,7 @@ class RedisConnectionParams
         return $this->timeout;
     }
 
-    public function getRetryInterval(): float
+    public function getRetryInterval(): int
     {
         return $this->retryInterval;
     }

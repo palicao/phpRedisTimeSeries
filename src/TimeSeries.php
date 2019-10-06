@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
@@ -63,7 +64,7 @@ class TimeSeries
      */
     public function add(Sample $sample, ?int $retentionMs = null, array $labels = []): Sample
     {
-        $timestamp = (int) $this->redis->executeCommand(array_merge(
+        $timestamp = (int)$this->redis->executeCommand(array_merge(
             ['TS.ADD'],
             $sample->toRedisParams(),
             $this->getRetentionParams($retentionMs),
@@ -206,8 +207,8 @@ class TimeSeries
         ?AggregationRule $rule = null
     ): array
     {
-        $fromTs = $from ? (int) $from->format('Uu') / 1000 : '-';
-        $toTs = $to ? (int) $to->format('Uu') / 1000 : '+';
+        $fromTs = $from ? (int)$from->format('Uu') / 1000 : '-';
+        $toTs = $to ? (int)$to->format('Uu') / 1000 : '+';
 
         $params = ['TS.RANGE', $key, $fromTs, $toTs];
         if ($count !== null) {
@@ -219,7 +220,7 @@ class TimeSeries
 
         $samples = [];
         foreach ($rawResults as $rawResult) {
-            $samples[] = Sample::createFromTimestamp($key, (float) $rawResult[1], (int) $rawResult[0]);
+            $samples[] = Sample::createFromTimestamp($key, (float)$rawResult[1], (int)$rawResult[0]);
         }
         return $samples;
     }
@@ -240,10 +241,10 @@ class TimeSeries
         ?DateTimeInterface $to = null,
         ?int $count = null,
         ?AggregationRule $rule = null
-    ) : array
+    ): array
     {
-        $fromTs = $from ? (int) $from->format('Uu') / 1000 : '-';
-        $toTs = $to ? (int) $to->format('Uu') / 1000 : '+';
+        $fromTs = $from ? (int)$from->format('Uu') / 1000 : '-';
+        $toTs = $to ? (int)$to->format('Uu') / 1000 : '+';
 
         $params = ['TS.MRANGE', $fromTs, $toTs];
         if ($count !== null) {
@@ -261,7 +262,7 @@ class TimeSeries
         foreach ($results as $groupByKey) {
             $key = $groupByKey[0];
             foreach ($groupByKey[2] as $result) {
-                $samples[] = Sample::createFromTimestamp($key, (float) $result[1], (int) $result[0]);
+                $samples[] = Sample::createFromTimestamp($key, (float)$result[1], (int)$result[0]);
             }
         }
         return $samples;
@@ -273,10 +274,10 @@ class TimeSeries
      * @throws RedisClientException
      * @throws RedisException
      */
-    public function getLastValue(string $key) : Sample
+    public function getLastValue(string $key): Sample
     {
         $result = $this->redis->executeCommand(['TS.GET', $key]);
-        return Sample::createFromTimestamp($key, (float) $result[1], (int) $result[0]);
+        return Sample::createFromTimestamp($key, (float)$result[1], (int)$result[0]);
     }
 
     /**
@@ -285,36 +286,41 @@ class TimeSeries
      * @throws RedisClientException
      * @throws RedisException
      */
-    public function getLastValues(Filter $filter) : array
+    public function getLastValues(Filter $filter): array
     {
         $results = $this->redis->executeCommand(['TS.MGET', 'FILTER', $filter->toRedisParams()]);
         $samples = [];
         foreach ($results as $result) {
-            $samples[] = Sample::createFromTimestamp($result[0], (float) $result[3], (int) $result[2]);
+            $samples[] = Sample::createFromTimestamp($result[0], (float)$result[3], (int)$result[2]);
         }
         return $samples;
     }
 
-    public function info(string $key) : Metadata
+    /**
+     * @param string $key
+     * @return Metadata
+     * @throws RedisException
+     */
+    public function info(string $key): Metadata
     {
         $res = $this->redis->executeCommand(['TS.INFO', $key]);
 
         $labels = [];
-        foreach($res[9] as $strLabel) {
+        foreach ($res[9] as $strLabel) {
             $labels[] = new Label($strLabel[0], $strLabel[1]);
         }
 
         $sourceKey = $res[11] === false ? null : $res[11];
 
         $rules = [];
-        foreach($res[13] as $rule) {
+        foreach ($res[13] as $rule) {
             $rules[$rule[0]] = new AggregationRule($rule[2], $rule[1]);
         }
 
         return Metadata::fromRedis($res[1], $res[3], $res[5], $res[7], $labels, $sourceKey, $rules);
     }
 
-    private function getRetentionParams(?int $retentionMs = null) : array
+    private function getRetentionParams(?int $retentionMs = null): array
     {
         if ($retentionMs === null) {
             return [];
@@ -326,7 +332,7 @@ class TimeSeries
      * @param Label[] $labels
      * @return array
      */
-    private function getLabelsParams(array $labels = []) : array
+    private function getLabelsParams(array $labels = []): array
     {
         if (empty($labels)) {
             return [];
@@ -341,7 +347,7 @@ class TimeSeries
         return $params;
     }
 
-    private function getAggregationParams(?AggregationRule $rule = null) : array
+    private function getAggregationParams(?AggregationRule $rule = null): array
     {
         if ($rule === null) {
             return [];

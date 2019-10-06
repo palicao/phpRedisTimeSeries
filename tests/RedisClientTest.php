@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries\Tests;
 
@@ -20,12 +21,12 @@ class RedisClientTest extends TestCase
             6379,
             3,
             null,
-            1.1,
+            1,
             2.2
         );
         $redisMock->expects($this->once())->method('rawCommand')->with('MY', 'command');
         $connectionParams = new RedisConnectionParams();
-        $connectionParams->setRetryInterval(1.1)
+        $connectionParams->setRetryInterval(1)
             ->setReadTimeout(2.2)
             ->setTimeout(3);
         $sut = new RedisClient($redisMock, $connectionParams);
@@ -41,7 +42,7 @@ class RedisClientTest extends TestCase
             6379,
             0,
             $this->isType(IsType::TYPE_STRING),
-            0.0,
+            0,
             0.0
         );
         $connectionParams = new RedisConnectionParams();

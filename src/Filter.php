@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
@@ -22,6 +23,7 @@ class Filter
         self::OP_NOT_IN
     ];
 
+    /** @var array */
     private $filters = [];
 
     public function __construct(string $label, string $value)
@@ -29,14 +31,19 @@ class Filter
         $this->filters[] = [$label, self::OP_EQUALS, $value];
     }
 
-    public function add(string $label, int $operation, $value = null)
+    /**
+     * @param string $label
+     * @param int $operation
+     * @param string|array|null $value
+     */
+    public function add(string $label, int $operation, $value = null): void
     {
         if (!in_array($operation, self::OPERATIONS, true)) {
             throw new InvalidFilterOperationException('Operation is not valid');
         }
 
-        if (in_array($operation, [self::OP_EQUALS, self::OP_NOT_EQUALS], true) && !is_scalar($value)) {
-            throw new InvalidFilterOperationException('The provided operation requires the value to be scalar');
+        if (in_array($operation, [self::OP_EQUALS, self::OP_NOT_EQUALS], true) && !is_string($value)) {
+            throw new InvalidFilterOperationException('The provided operation requires the value to be string');
         }
 
         if (in_array($operation, [self::OP_EXISTS, self::OP_NOT_EXISTS], true) && $value !== null) {

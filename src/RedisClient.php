@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
@@ -31,6 +32,7 @@ class RedisClient
         $params = $this->connectionParams;
 
         if ($params->isPersistentConnection()) {
+            /** @psalm-suppress TooManyArguments */
             $result = $this->redis->pconnect(
                 $params->getHost(),
                 $params->getPort(),
@@ -51,14 +53,14 @@ class RedisClient
         }
 
         // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
-        $this->redis->setOption(8, true);
+        $this->redis->setOption(8, 1);
 
         if ($result === false) {
             throw new RedisClientException(sprintf(
                 'Unable to connect to redis server %s:%s: %s',
                 $params->getHost(),
                 $params->getPort(),
-                $this->redis->getLastError()
+                $this->redis->getLastError() ?? 'unknown error'
             ));
         }
     }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
@@ -23,9 +24,9 @@ class Sample
         $this->dateTime = $dateTime;
     }
 
-    public static function createFromTimestamp(string $key, float $value, int $timestamp) : Sample
+    public static function createFromTimestamp(string $key, float $value, int $timestamp): Sample
     {
-        $dateTime = DateTimeImmutable::createFromFormat('U.u', (string) $timestamp / 1000);
+        $dateTime = DateTimeImmutable::createFromFormat('U.u', (string)($timestamp / 1000));
         return new self($key, $value, $dateTime);
     }
 
@@ -52,10 +53,10 @@ class Sample
         if ($this->dateTime === null) {
             return '*';
         }
-        return (int) round($this->dateTime->format('Uu') / 1000);
+        return (int)round((int)$this->dateTime->format('Uu') / 1000);
     }
 
-    public function toRedisParams() : array
+    public function toRedisParams(): array
     {
         return [$this->getKey(), $this->getTimestampWithMs(), $this->getValue()];
     }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries\Tests;
 
@@ -20,12 +21,12 @@ class FilterTest extends TestCase
 
     /**
      * @param mixed $operation
-     * @dataProvider scalarOperations
+     * @dataProvider stringOperations
      */
-    public function testOperationRequiresScalar($operation): void
+    public function testOperationRequiresString($operation): void
     {
         $this->expectException(InvalidFilterOperationException::class);
-        $this->expectExceptionMessage('The provided operation requires the value to be scalar');
+        $this->expectExceptionMessage('The provided operation requires the value to be string');
 
         $filter = new Filter('a', 'b');
         $filter->add('a', $operation, []);
@@ -72,7 +73,7 @@ class FilterTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function scalarOperations(): array
+    public function stringOperations(): array
     {
         return [[Filter::OP_EQUALS], [Filter::OP_NOT_EQUALS]];
     }

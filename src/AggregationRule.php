@@ -20,7 +20,7 @@ class AggregationRule
     public const AGG_VAR_P = 'VAR.P';
     public const AGG_VAR_S = 'VAR.S';
 
-    public const AGGREGATIONS = [
+    private const AGGREGATIONS = [
         self::AGG_AVG,
         self::AGG_SUM,
         self::AGG_MIN,

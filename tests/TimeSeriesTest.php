@@ -5,7 +5,9 @@ namespace Palicao\PhpRedisTimeSeries\Tests;
 
 use DateTimeImmutable;
 use Palicao\PhpRedisTimeSeries\AggregationRule;
+use Palicao\PhpRedisTimeSeries\Filter;
 use Palicao\PhpRedisTimeSeries\Label;
+use Palicao\PhpRedisTimeSeries\Metadata;
 use Palicao\PhpRedisTimeSeries\RedisClient;
 use Palicao\PhpRedisTimeSeries\Sample;
 use Palicao\PhpRedisTimeSeries\TimeSeries;
@@ -42,12 +44,12 @@ class TimeSeriesTest extends TestCase
         $this->sut->create(...$params);
     }
 
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
         return [
-            [['a', 10, [new Label('l1', 'v1'), new Label('l2', 'v2')]], ['TS.CREATE', 'a', 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']],
-            [['a', 10], ['TS.CREATE', 'a', 'RETENTION', 10]],
-            [['a'], ['TS.CREATE', 'a']],
+            'full' => [['a', 10, [new Label('l1', 'v1'), new Label('l2', 'v2')]], ['TS.CREATE', 'a', 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']],
+            'no labels' => [['a', 10], ['TS.CREATE', 'a', 'RETENTION', 10]],
+            'minimal' => [['a'], ['TS.CREATE', 'a']]
         ];
     }
 
@@ -72,26 +74,33 @@ class TimeSeriesTest extends TestCase
         $this->redisClientMock
             ->expects($this->once())
             ->method('executeCommand')
-            ->with(['TS.ADD', 'a', '*', 10.1, 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2'])
+            ->with($expectedParams)
             ->willReturn(1483300866234);
-        $addedSample = $this->sut->add(
-            new Sample('a', 10.1),
-            10,
-            [new Label('l1', 'v1'), new Label('l2', 'v2')]
-        );
+        $addedSample = $this->sut->add(...$params);
         $expectedSample = new Sample('a', 10.1, new DateTimeImmutable('2017-01-01T20.01.06.234'));
         $this->assertEquals($expectedSample, $addedSample);
     }
 
-    public function addDataProvider()
+    public function addDataProvider(): array
     {
-        return [[
-            new Sample('a', 10.1), 10, [new Label('l1', 'v1'), new Label('l2', 'v2')],
-            ['TS.ADD', 'a', '*', 10.1, 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']
-        ], [
-            new Sample('a', 10.1, new DateTimeImmutable('2017-01-01T20.01.06.234')), 10, [new Label('l1', 'v1'), new Label('l2', 'v2')],
-            ['TS.ADD', 'a', 1483300866234, 10.1, 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']
-        ]];
+        return [
+            'full' => [
+                [
+                    new Sample('a', 10.1, new DateTimeImmutable('2017-01-01T20.01.06.234')),
+                    10,
+                    [new Label('l1', 'v1'), new Label('l2', 'v2')]
+                ],
+                ['TS.ADD', 'a', 1483300866234, 10.1, 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']
+            ],
+            'no datetime' => [
+                [
+                    new Sample('a', 10.1),
+                    10,
+                    [new Label('l1', 'v1'), new Label('l2', 'v2')]
+                ],
+                ['TS.ADD', 'a', '*', 10.1, 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']
+            ]
+        ];
     }
 
     public function testAddMany(): void
@@ -112,7 +121,7 @@ class TimeSeriesTest extends TestCase
         $this->assertEquals($expectedSamples, $addedSamples);
     }
 
-    public function testAddManyEmpty()
+    public function testAddManyEmpty(): void
     {
         $this->redisClientMock
             ->expects($this->never())
@@ -171,20 +180,17 @@ class TimeSeriesTest extends TestCase
         $this->sut->deleteRule('a', 'b');
     }
 
-    public function testRange(): void
+    /**
+     * @dataProvider rangeDataProvider
+     */
+    public function testRange(array $params, array $expectedRedisParam): void
     {
         $this->redisClientMock
             ->expects($this->once())
             ->method('executeCommand')
-            ->with(['TS.RANGE', 'a', 1483300866234, 1522923630234, 'COUNT', 100, 'AGGREGATION', 'LAST', 200])
-            ->willReturn([[1483300866234, 9.1], [1522923630234, 9.2]]);
-        $returnedSamples = $this->sut->range(
-            'a',
-            new DateTimeImmutable('2017-01-01T20.01.06.234'),
-            new DateTimeImmutable('2018-04-05T10.20.30.234'),
-            100,
-            new AggregationRule(AggregationRule::AGG_LAST, 200)
-        );
+            ->with($expectedRedisParam)
+            ->willReturn([[1483300866234, '9.1'], [1522923630234, '9.2']]);
+        $returnedSamples = $this->sut->range(...$params);
         $expectedSamples = [
             new Sample('a', 9.1, new DateTimeImmutable('2017-01-01T20.01.06.234')),
             new Sample('a', 9.2, new DateTimeImmutable('2018-04-05T10.20.30.234'))
@@ -193,90 +199,187 @@ class TimeSeriesTest extends TestCase
         $this->assertEquals($expectedSamples, $returnedSamples);
     }
 
-    public function testRangeWithoutFrom(): void
+    public function rangeDataProvider(): array
     {
-        $this->redisClientMock
-            ->expects($this->once())
-            ->method('executeCommand')
-            ->with(['TS.RANGE', 'a', '-', 1522923630234, 'COUNT', 100, 'AGGREGATION', 'LAST', 200])
-            ->willReturn([]);
-        $this->sut->range(
-            'a',
-            null,
-            new DateTimeImmutable('2018-04-05T10.20.30.234'),
-            100,
-            new AggregationRule(AggregationRule::AGG_LAST, 200)
-        );
+        return [
+            'full data' => [[
+                'a',
+                new DateTimeImmutable('2017-01-01T20.01.06.234'),
+                new DateTimeImmutable('2018-04-05T10.20.30.234'),
+                100,
+                new AggregationRule(AggregationRule::AGG_LAST, 200)
+            ], [
+                'TS.RANGE', 'a', 1483300866234, 1522923630234, 'COUNT', 100, 'AGGREGATION', 'LAST', 200
+            ]],
+            'missing from' => [[
+                'a',
+                null,
+                new DateTimeImmutable('2018-04-05T10.20.30.234'),
+                100,
+                new AggregationRule(AggregationRule::AGG_LAST, 200)
+            ], [
+                'TS.RANGE', 'a', '-', 1522923630234, 'COUNT', 100, 'AGGREGATION', 'LAST', 200
+            ]],
+            'missing from and to' => [[
+                'a',
+                null,
+                null,
+                100,
+                new AggregationRule(AggregationRule::AGG_LAST, 200)
+            ], [
+                'TS.RANGE', 'a', '-', '+', 'COUNT', 100, 'AGGREGATION', 'LAST', 200
+            ]],
+            'missing from, to and count' => [[
+                'a',
+                null,
+                null,
+                null,
+                new AggregationRule(AggregationRule::AGG_LAST, 200)
+            ], [
+                'TS.RANGE', 'a', '-', '+', 'AGGREGATION', 'LAST', 200
+            ]],
+            'minimal' => [['a'], ['TS.RANGE', 'a', '-', '+']]
+        ];
     }
-
-    public function testRangeWithoutFromAndTo(): void
-    {
-        $this->redisClientMock
-            ->expects($this->once())
-            ->method('executeCommand')
-            ->with(['TS.RANGE', 'a', '-', '+', 'COUNT', 100, 'AGGREGATION', 'LAST', 200])
-            ->willReturn([]);
-        $this->sut->range(
-            'a',
-            null,
-            null,
-            100,
-            new AggregationRule(AggregationRule::AGG_LAST, 200)
-        );
-    }
-
-    public function testRangeWithoutFromToAndCount(): void
-    {
-        $this->redisClientMock
-            ->expects($this->once())
-            ->method('executeCommand')
-            ->with(['TS.RANGE', 'a', '-', '+', 'AGGREGATION', 'LAST', 200])
-            ->willReturn([]);
-        $this->sut->range(
-            'a',
-            null,
-            null,
-            null,
-            new AggregationRule(AggregationRule::AGG_LAST, 200)
-        );
-    }
-
-    public function testRangeWithoutFromToCountAndAggregation(): void
-    {
-        $this->redisClientMock
-            ->expects($this->once())
-            ->method('executeCommand')
-            ->with(['TS.RANGE', 'a', '-', '+'])
-            ->willReturn([]);
-        $this->sut->range(
-            'a'
-        );
-    }
-
 
     public function testInfo(): void
     {
+        $this->redisClientMock
+            ->expects($this->once())
+            ->method('executeCommand')
+            ->with(['TS.INFO', 'a'])
+            ->willReturn([
+                'lastTimestamp',
+                1522923630234,
+                'retentionTime',
+                100,
+                'chunkCount',
+                10,
+                'maxSamplesPerChunk',
+                360,
+                'labels',
+                [['a', 'a1'], ['b', 'b1']],
+                'sourceKey',
+                null,
+                'rules',
+                [['aa', 10, 'AVG']]
+            ]);
+        $returned = $this->sut->info('a');
+        $expected = new Metadata(
+            new DateTimeImmutable('2018-04-05T10.20.30.234'),
+            100,
+            10,
+            360,
+            [new Label('a', 'a1'), new Label('b', 'b1')],
+            null,
+            ['aa' => new AggregationRule(AggregationRule::AGG_AVG, 10)]
+        );
 
+        $this->assertEquals($expected, $returned);
     }
 
 
     public function testGetLastValue(): void
     {
-
+        $this->redisClientMock
+            ->expects($this->once())
+            ->method('executeCommand')
+            ->with(['TS.GET', 'a'])
+            ->willReturn([1483300866234, '7']);
+        $response = $this->sut->getLastValue('a');
+        $expected = new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234'));
+        $this->assertEquals($expected, $response);
     }
 
 
     public function testGetLastValues(): void
     {
-
+        $this->redisClientMock
+            ->expects($this->once())
+            ->method('executeCommand')
+            ->with(['TS.MGET', 'FILTER', 'a=a1'])
+            ->willReturn([
+                ['a', [['a', 'a1'], ['b', 'b1']], 1483300866234, '7'],
+                ['b', [['a', 'a1'], ['c', 'c1']], 1522923630234, '7.1'],
+            ]);
+        $response = $this->sut->getLastValues(new Filter('a', 'a1'));
+        $expected = [
+            new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234')),
+            new Sample('b', 7.1, new DateTimeImmutable('2018-04-05T10.20.30.234')),
+        ];
+        $this->assertEquals($expected, $response);
     }
 
-
-    public function testMultiRange(): void
+    /**
+     * @dataProvider multiRangeDataProvider
+     */
+    public function testMultiRange(array $params, array $expectedRedisParams): void
     {
-
+        $this->redisClientMock
+            ->expects($this->once())
+            ->method('executeCommand')
+            ->with($expectedRedisParams)
+            ->willReturn([
+                ['a', [['a', 'a1']], [[1483300866234, '7']]],
+                ['b', [['a', 'a1']], [[1522923630234, '7.1']]],
+            ]);
+        $response = $this->sut->multiRange(...$params);
+        $expected = [
+            new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234')),
+            new Sample('b', 7.1, new DateTimeImmutable('2018-04-05T10.20.30.234')),
+        ];
+        $this->assertEquals($expected, $response);
     }
 
+    public function multiRangeDataProvider(): array
+    {
+        return [
+            'full data' => [
+                [
+                    new Filter('a', 'a1'),
+                    new DateTimeImmutable('2017-01-01T20.01.06.234'),
+                    new DateTimeImmutable('2018-04-05T10.20.30.234'),
+                    100,
+                    new AggregationRule(AggregationRule::AGG_LAST, 200)
+                ],
+                ['TS.MRANGE', 1483300866234, 1522923630234, 'COUNT', 100, 'AGGREGATION', 'LAST', 200, 'FILTER', 'a=a1']
+            ],
+            'missing dates' => [
+                [
+                    new Filter('a', 'a1'),
+                    null,
+                    null,
+                    100,
+                    new AggregationRule(AggregationRule::AGG_LAST, 200)
+                ],
+                ['TS.MRANGE', '-', '+', 'COUNT', 100, 'AGGREGATION', 'LAST', 200, 'FILTER', 'a=a1']
+            ],
+            'missing dates and count' => [
+                [
+                    new Filter('a', 'a1'),
+                    null,
+                    null,
+                    null,
+                    new AggregationRule(AggregationRule::AGG_LAST, 200)
+                ],
+                ['TS.MRANGE', '-', '+', 'AGGREGATION', 'LAST', 200, 'FILTER', 'a=a1']
+            ],
+            'minimal' => [
+                [new Filter('a', 'a1')],
+                ['TS.MRANGE', '-', '+', 'FILTER', 'a=a1']
+            ]
+        ];
+    }
 
-
+    public function testGetKeysFromFilter(): void
+    {
+        $keys = ['a', 'b'];
+        $this->redisClientMock
+            ->expects($this->once())
+            ->method('executeCommand')
+            ->with(['TS.QUERYINDEX', 'a=a1'])
+            ->willReturn($keys);
+        $response = $this->sut->getKeysFromFilter(new Filter('a', 'a1'));
+        $this->assertEquals($keys, $response);
+    }
 }

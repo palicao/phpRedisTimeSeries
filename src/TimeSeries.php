@@ -303,21 +303,31 @@ class TimeSeries
      */
     public function info(string $key): Metadata
     {
-        $res = $this->redis->executeCommand(['TS.INFO', $key]);
+        $result = $this->redis->executeCommand(['TS.INFO', $key]);
 
         $labels = [];
-        foreach ($res[9] as $strLabel) {
+        foreach ($result[9] as $strLabel) {
             $labels[] = new Label($strLabel[0], $strLabel[1]);
         }
 
-        $sourceKey = $res[11] === false ? null : $res[11];
+        $sourceKey = $result[11] === false ? null : $result[11];
 
         $rules = [];
-        foreach ($res[13] as $rule) {
+        foreach ($result[13] as $rule) {
             $rules[$rule[0]] = new AggregationRule($rule[2], $rule[1]);
         }
 
-        return Metadata::fromRedis($res[1], $res[3], $res[5], $res[7], $labels, $sourceKey, $rules);
+        return Metadata::fromRedis($result[1], $result[3], $result[5], $result[7], $labels, $sourceKey, $rules);
+    }
+
+    /**
+     * @param Filter $filter
+     * @return string[]
+     * @throws RedisException
+     */
+    public function getKeysFromFilter(Filter $filter): array
+    {
+        return $this->redis->executeCommand(['TS.QUERYINDEX', $filter->toRedisParams()]);
     }
 
     private function getRetentionParams(?int $retentionMs = null): array

@@ -42,15 +42,15 @@ class Filter
             throw new InvalidFilterOperationException('Operation is not valid');
         }
 
-        if (in_array($operation, [self::OP_EQUALS, self::OP_NOT_EQUALS], true) && !is_string($value)) {
+        if (!is_string($value) && in_array($operation, [self::OP_EQUALS, self::OP_NOT_EQUALS], true)) {
             throw new InvalidFilterOperationException('The provided operation requires the value to be string');
         }
 
-        if (in_array($operation, [self::OP_EXISTS, self::OP_NOT_EXISTS], true) && $value !== null) {
+        if ($value !== null && in_array($operation, [self::OP_EXISTS, self::OP_NOT_EXISTS], true)) {
             throw new InvalidFilterOperationException('The provided operation requires the value to be null');
         }
 
-        if (in_array($operation, [self::OP_IN, self::OP_NOT_IN], true) && !is_array($value)) {
+        if (!is_array($value) && in_array($operation, [self::OP_IN, self::OP_NOT_IN], true)) {
             throw new InvalidFilterOperationException('The provided operation requires the value to be an array');
         }
 

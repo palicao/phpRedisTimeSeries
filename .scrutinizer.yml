@@ -1,8 +1,4 @@
 build:
-  environment:
-    php:
-      pecl_extensions:
-        - redis
   nodes:
     analysis:
       project_setup:

@@ -1,5 +1,6 @@
 {
     "name": "palicao/php-redis-time-series",
+    "license": "MIT",
     "authors": [
         {
             "name": "Alessandro Balasco",
@@ -17,6 +18,7 @@
         }
     },
     "require": {
+        "php": ">=7.2.0",
         "ext-redis": "*"
     },
     "require-dev": {

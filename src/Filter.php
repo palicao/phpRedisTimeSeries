@@ -35,8 +35,9 @@ class Filter
      * @param string $label
      * @param int $operation
      * @param string|array|null $value
+     * @return self
      */
-    public function add(string $label, int $operation, $value = null): void
+    public function add(string $label, int $operation, $value = null): self
     {
         if (!in_array($operation, self::OPERATIONS, true)) {
             throw new InvalidFilterOperationException('Operation is not valid');
@@ -55,6 +56,8 @@ class Filter
         }
 
         $this->filters[] = [$label, $operation, $value];
+
+        return $this;
     }
 
     public function toRedisParams() : string

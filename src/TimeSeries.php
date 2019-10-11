@@ -21,6 +21,8 @@ class TimeSeries
     }
 
     /**
+     * Creates a key
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tscreate
      * @param string $key
      * @param int|null $retentionMs
      * @param Label[] $labels
@@ -38,6 +40,8 @@ class TimeSeries
     }
 
     /**
+     * Modifies an existing key
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tsalter
      * @param string $key
      * @param int|null $retentionMs
      * @param Label[] $labels
@@ -55,6 +59,8 @@ class TimeSeries
     }
 
     /**
+     * Adds a sample
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tsadd
      * @param Sample $sample
      * @param int|null $retentionMs
      * @param Label[] $labels
@@ -74,6 +80,8 @@ class TimeSeries
     }
 
     /**
+     * Adds many samples
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tsmadd
      * @param Sample[] $samples
      * @return Sample[]
      * @throws RedisClientException
@@ -101,6 +109,8 @@ class TimeSeries
     }
 
     /**
+     * Increments a sample by the amount given in the passed sample
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tsincrbytsdecrby
      * @param Sample $sample
      * @param int|null $resetMs
      * @param int|null $retentionMs
@@ -114,6 +124,8 @@ class TimeSeries
     }
 
     /**
+     * Decrements a sample by the amount given in the passed sample
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tsincrbytsdecrby
      * @param Sample $sample
      * @param int|null $resetMs
      * @param int|null $retentionMs
@@ -162,6 +174,8 @@ class TimeSeries
     }
 
     /**
+     * Creates an aggregation rules for a key
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tscreaterule
      * @param string $sourceKey
      * @param string $destKey
      * @param AggregationRule $rule
@@ -178,6 +192,8 @@ class TimeSeries
     }
 
     /**
+     * Deletes an existing aggregation rule
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tsdeleterule
      * @param string $sourceKey
      * @param string $destKey
      * @return void
@@ -190,6 +206,8 @@ class TimeSeries
     }
 
     /**
+     * Gets samples for a key, optionally aggregating them
+     * @see https://oss.redislabs.com/redistimeseries/commands/#tsrange
      * @param string $key
      * @param DateTimeInterface|null $from
      * @param DateTimeInterface|null $to
@@ -226,6 +244,7 @@ class TimeSeries
     }
 
     /**
+     * Gets samples from multiple keys, searching by a given filter.
      * @param Filter $filter
      * @param DateTimeInterface|null $from
      * @param DateTimeInterface|null $to
@@ -269,24 +288,26 @@ class TimeSeries
     }
 
     /**
+     * Gets the last sample for a key
      * @param string $key
      * @return Sample
      * @throws RedisClientException
      * @throws RedisException
      */
-    public function getLastValue(string $key): Sample
+    public function getLastSample(string $key): Sample
     {
         $result = $this->redis->executeCommand(['TS.GET', $key]);
         return Sample::createFromTimestamp($key, (float)$result[1], (int)$result[0]);
     }
 
     /**
+     * Gets the last samples for multiple keys using a filter
      * @param Filter $filter
      * @return array
      * @throws RedisClientException
      * @throws RedisException
      */
-    public function getLastValues(Filter $filter): array
+    public function getLastSamples(Filter $filter): array
     {
         $results = $this->redis->executeCommand(['TS.MGET', 'FILTER', $filter->toRedisParams()]);
         $samples = [];
@@ -297,6 +318,7 @@ class TimeSeries
     }
 
     /**
+     * Gets metadata regarding a key
      * @param string $key
      * @return Metadata
      * @throws RedisException
@@ -321,11 +343,12 @@ class TimeSeries
     }
 
     /**
+     * Lists the keys matching a filter
      * @param Filter $filter
      * @return string[]
      * @throws RedisException
      */
-    public function getKeysFromFilter(Filter $filter): array
+    public function getKeysByFilter(Filter $filter): array
     {
         return $this->redis->executeCommand(['TS.QUERYINDEX', $filter->toRedisParams()]);
     }

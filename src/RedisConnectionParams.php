@@ -33,24 +33,44 @@ class RedisConnectionParams
         $this->readTimeout = 0.0;
     }
 
+    /**
+     * Whether to use a persistent connection
+     * @param bool $persistentConnection
+     * @return RedisConnectionParams
+     */
     public function setPersistentConnection(bool $persistentConnection): RedisConnectionParams
     {
         $this->persistentConnection = $persistentConnection;
         return $this;
     }
 
+    /**
+     * Connection timeout (in seconds)
+     * @param int $timeout
+     * @return RedisConnectionParams
+     */
     public function setTimeout(int $timeout): RedisConnectionParams
     {
         $this->timeout = $timeout;
         return $this;
     }
 
+    /**
+     * Retry interval (in seconds)
+     * @param int $retryInterval
+     * @return RedisConnectionParams
+     */
     public function setRetryInterval(int $retryInterval): RedisConnectionParams
     {
         $this->retryInterval = $retryInterval;
         return $this;
     }
 
+    /**
+     * Read timeout in seconds
+     * @param float $readTimeout
+     * @return RedisConnectionParams
+     */
     public function setReadTimeout(float $readTimeout): RedisConnectionParams
     {
         $this->readTimeout = $readTimeout;

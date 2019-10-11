@@ -279,20 +279,20 @@ class TimeSeriesTest extends TestCase
     }
 
 
-    public function testGetLastValue(): void
+    public function testGetLastSample(): void
     {
         $this->redisClientMock
             ->expects($this->once())
             ->method('executeCommand')
             ->with(['TS.GET', 'a'])
             ->willReturn([1483300866234, '7']);
-        $response = $this->sut->getLastValue('a');
+        $response = $this->sut->getLastSample('a');
         $expected = new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234'));
         $this->assertEquals($expected, $response);
     }
 
 
-    public function testGetLastValues(): void
+    public function testGetLastSamples(): void
     {
         $this->redisClientMock
             ->expects($this->once())
@@ -302,7 +302,7 @@ class TimeSeriesTest extends TestCase
                 ['a', [['a', 'a1'], ['b', 'b1']], 1483300866234, '7'],
                 ['b', [['a', 'a1'], ['c', 'c1']], 1522923630234, '7.1'],
             ]);
-        $response = $this->sut->getLastValues(new Filter('a', 'a1'));
+        $response = $this->sut->getLastSamples(new Filter('a', 'a1'));
         $expected = [
             new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234')),
             new Sample('b', 7.1, new DateTimeImmutable('2018-04-05T10.20.30.234')),
@@ -371,7 +371,7 @@ class TimeSeriesTest extends TestCase
         ];
     }
 
-    public function testGetKeysFromFilter(): void
+    public function testGetKeysByFilter(): void
     {
         $keys = ['a', 'b'];
         $this->redisClientMock
@@ -379,7 +379,7 @@ class TimeSeriesTest extends TestCase
             ->method('executeCommand')
             ->with(['TS.QUERYINDEX', 'a=a1'])
             ->willReturn($keys);
-        $response = $this->sut->getKeysFromFilter(new Filter('a', 'a1'));
+        $response = $this->sut->getKeysByFilter(new Filter('a', 'a1'));
         $this->assertEquals($keys, $response);
     }
 }

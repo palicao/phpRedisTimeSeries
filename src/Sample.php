@@ -29,7 +29,7 @@ class Sample
     {
         $dateTime = DateTimeImmutable::createFromFormat('U.u', (string)($timestamp / 1000));
         if ($dateTime === false) {
-            throw new InvalidArgumentException(sprintf('Impossible to extract timestamp from %d', $dateTime));
+            throw new InvalidArgumentException(sprintf('Impossible to extract timestamp from %d', $timestamp));
         }
         return new self($key, $value, $dateTime);
     }

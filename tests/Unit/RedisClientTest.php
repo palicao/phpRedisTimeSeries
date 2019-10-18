@@ -1,7 +1,8 @@
 <?php
+/* @noinspection PhpUnhandledExceptionInspection */
 declare(strict_types=1);
 
-namespace Palicao\PhpRedisTimeSeries\Tests;
+namespace Palicao\PhpRedisTimeSeries\Tests\Unit;
 
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
 use Palicao\PhpRedisTimeSeries\RedisClient;

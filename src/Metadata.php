@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
-use DateTimeImmutable;
 use DateTimeInterface;
-use InvalidArgumentException;
 
 class Metadata
 {
@@ -68,10 +66,7 @@ class Metadata
         array $rules = []
     ): self
     {
-        $dateTime = DateTimeImmutable::createFromFormat('U.u', (string)($lastTimestamp / 1000));
-        if ($dateTime === false) {
-            throw new InvalidArgumentException(sprintf('Impossible to extract timestamp from %d', $lastTimestamp));
-        }
+        $dateTime = DateTimeUtils::dateTimeFromTimestampWithMs($lastTimestamp);
         return new self($dateTime, $retentionTime, $chunkCount, $maxSamplesPerChunk, $labels, $sourceKey, $rules);
     }
 

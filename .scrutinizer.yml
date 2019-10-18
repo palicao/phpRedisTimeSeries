@@ -1,5 +1,6 @@
 build:
   nodes:
+
     analysis:
       project_setup:
         override:
@@ -10,14 +11,31 @@ build:
           -
             command: phpcs-run
             use_website_config: true
+
     coverage:
+      environment:
+        php:
+          pecl_extensions:
+            - redis
+        variables:
+          REDIS_HOST: localhost
+      services:
+        redis-timeseries:
+          image: redislabs/redistimeseries:1.0.3
+          ports:
+            - 6379
       tests:
         override:
           - command: vendor/bin/phpunit
             coverage:
               file: build/coverage.xml
               format: 'php-clover'
+
     psalm:
+      environment:
+        php:
+          pecl_extensions:
+            - redis
       tests:
         override:
           - command: vendor/bin/psalm

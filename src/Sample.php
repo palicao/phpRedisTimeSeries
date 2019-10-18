@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
-use DateTimeImmutable;
 use DateTimeInterface;
-use InvalidArgumentException;
 
 class Sample
 {
@@ -27,11 +25,7 @@ class Sample
 
     public static function createFromTimestamp(string $key, float $value, int $timestamp): Sample
     {
-        $dateTime = DateTimeImmutable::createFromFormat('U.u', (string)($timestamp / 1000));
-        if ($dateTime === false) {
-            throw new InvalidArgumentException(sprintf('Impossible to extract timestamp from %d', $dateTime));
-        }
-        return new self($key, $value, $dateTime);
+        return new self($key, $value, DateTimeUtils::dateTimeFromTimestampWithMs($timestamp));
     }
 
     public function getKey(): string
@@ -57,7 +51,7 @@ class Sample
         if ($this->dateTime === null) {
             return '*';
         }
-        return (int)round((int)$this->dateTime->format('Uu') / 1000);
+        return DateTimeUtils::timestampWithMsFromDateTime($this->dateTime);
     }
 
     public function toRedisParams(): array

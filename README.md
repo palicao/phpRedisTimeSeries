@@ -11,7 +11,10 @@ Use [Redis Time Series](https://oss.redislabs.com/redistimeseries/) in PHP!
 
 ```
 $ts = new TimeSeries(
-    new RedisClient(new Redis(),new RedisConnectionParams($host, $port))
+    new RedisClient(
+        new Redis(),
+        new RedisConnectionParams($host, $port)
+    )
 );
 ```
 
@@ -155,9 +158,6 @@ You can manipulate your `RedisConnectionParams` using the following methods:
 * `RedisConnectionParams::setRetryInterval(int $retryInterval)` retry interval in seconds
 * `RedisConnectionParams::setReadTimeout(float $readTimeout)` read timeout in seconds
 
-For local testing you can use the provided `docker-compose.yml` file, which will create a PHP container (with the redis
-extension pre-installed), and a redis container (with Redis Time Series included).
-
 ## Building Filters
 
 A `Filter` is composed of multiple filtering operations. At least one equality operation must be provided (in the 
@@ -169,3 +169,7 @@ Examples:
 and have label2.
 * `$f = (new Filter('label1', 'value1'))->add('label2', Filter::OP_IN, ['a', 'b', 'c']);` filters items which have
 label1 = value1 and where label2 is one of 'a', 'b' or 'c'.
+
+## Local testing
+For local testing you can use the provided `docker-compose.yml` file, which will create a PHP container (with the redis
+extension pre-installed), and a redis container (with Redis Time Series included).

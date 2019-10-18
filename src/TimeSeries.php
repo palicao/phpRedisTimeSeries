@@ -35,7 +35,7 @@ class TimeSeries
         $this->redis->executeCommand(array_merge(
             ['TS.CREATE', $key],
             $this->getRetentionParams($retentionMs),
-            $this->getLabelsParams($labels)
+            $this->getLabelsParams(...$labels)
         ));
     }
 
@@ -54,7 +54,7 @@ class TimeSeries
         $this->redis->executeCommand(array_merge(
             ['TS.ALTER', $key],
             $this->getRetentionParams($retentionMs),
-            $this->getLabelsParams($labels)
+            $this->getLabelsParams(...$labels)
         ));
     }
 
@@ -74,7 +74,7 @@ class TimeSeries
             ['TS.ADD'],
             $sample->toRedisParams(),
             $this->getRetentionParams($retentionMs),
-            $this->getLabelsParams($labels)
+            $this->getLabelsParams(...$labels)
         ));
         return Sample::createFromTimestamp($sample->getKey(), $sample->getValue(), $timestamp);
     }
@@ -168,7 +168,7 @@ class TimeSeries
         $params = array_merge(
             $params,
             $this->getRetentionParams($retentionMs),
-            $this->getLabelsParams($labels)
+            $this->getLabelsParams(...$labels)
         );
         $this->redis->executeCommand($params);
     }
@@ -362,21 +362,22 @@ class TimeSeries
     }
 
     /**
-     * @param Label[] $labels
+     * @param Label ...$labels
      * @return array
      */
-    private function getLabelsParams(array $labels = []): array
+    private function getLabelsParams(Label ...$labels): array
     {
-        if (empty($labels)) {
-            return [];
-        }
-
-        $params = ['LABELS'];
+        $params = [];
         foreach ($labels as $label) {
             $params[] = $label->getKey();
             $params[] = $label->getValue();
         }
 
+        if (empty($params)) {
+            return [];
+        }
+
+        array_unshift($params, 'LABELS');
         return $params;
     }
 

@@ -5,6 +5,7 @@ namespace Palicao\PhpRedisTimeSeries;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use InvalidArgumentException;
 
 class Sample
 {
@@ -27,6 +28,9 @@ class Sample
     public static function createFromTimestamp(string $key, float $value, int $timestamp): Sample
     {
         $dateTime = DateTimeImmutable::createFromFormat('U.u', (string)($timestamp / 1000));
+        if ($dateTime === false) {
+            throw new InvalidArgumentException(sprintf('Impossible to extract timestamp from %d', $dateTime));
+        }
         return new self($key, $value, $dateTime);
     }
 

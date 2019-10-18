@@ -5,6 +5,7 @@ namespace Palicao\PhpRedisTimeSeries;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use InvalidArgumentException;
 
 class Metadata
 {
@@ -46,7 +47,8 @@ class Metadata
         array $labels = [],
         ?string $sourceKey = null,
         array $rules = []
-    ) {
+    )
+    {
         $this->lastTimestamp = $lastTimestamp;
         $this->retentionTime = $retentionTime;
         $this->chunkCount = $chunkCount;
@@ -57,15 +59,19 @@ class Metadata
     }
 
     public static function fromRedis(
-        int $lastTimestamp,int $retentionTime = 0,
+        int $lastTimestamp,
+        int $retentionTime = 0,
         int $chunkCount = 0,
         int $maxSamplesPerChunk = 0,
         array $labels = [],
         ?string $sourceKey = null,
         array $rules = []
-    ) : self
+    ): self
     {
-        $dateTime = DateTimeImmutable::createFromFormat('U.u', (string) ($lastTimestamp / 1000));
+        $dateTime = DateTimeImmutable::createFromFormat('U.u', (string)($lastTimestamp / 1000));
+        if ($dateTime === false) {
+            throw new InvalidArgumentException(sprintf('Impossible to extract timestamp from %d', $lastTimestamp));
+        }
         return new self($dateTime, $retentionTime, $chunkCount, $maxSamplesPerChunk, $labels, $sourceKey, $rules);
     }
 

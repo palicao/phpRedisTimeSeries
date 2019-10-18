@@ -60,7 +60,7 @@ class Filter
         return $this;
     }
 
-    public function toRedisParams() : string
+    public function toRedisParams(): string
     {
         $params = [];
         foreach ($this->filters as $filter) {

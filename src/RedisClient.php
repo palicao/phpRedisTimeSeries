@@ -15,7 +15,8 @@ class RedisClient
     /** @var RedisConnectionParams */
     private $connectionParams;
 
-    public function __construct(Redis $redis, RedisConnectionParams $connectionParams) {
+    public function __construct(Redis $redis, RedisConnectionParams $connectionParams)
+    {
         $this->redis = $redis;
         $this->connectionParams = $connectionParams;
     }

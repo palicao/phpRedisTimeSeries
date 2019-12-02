@@ -262,20 +262,7 @@ class TimeSeries
         ?AggregationRule $rule = null
     ): array
     {
-        $fromTs = $from ? (int)$from->format('Uu') / 1000 : '-';
-        $toTs = $to ? (int)$to->format('Uu') / 1000 : '+';
-
-        $params = ['TS.MRANGE', $fromTs, $toTs];
-        if ($count !== null) {
-            $params[] = 'COUNT';
-            $params[] = $count;
-        }
-
-        $results = $this->redis->executeCommand(array_merge(
-            $params,
-            $this->getAggregationParams($rule),
-            ['FILTER', $filter->toRedisParams()]
-        ));
+        $results = $this->multiRangeRaw($filter, $from, $to, $count, $rule);
 
         $samples = [];
         foreach ($results as $groupByKey) {
@@ -285,6 +272,29 @@ class TimeSeries
             }
         }
         return $samples;
+    }
+
+    public function multiRangeRaw(Filter $filter,
+          ?DateTimeInterface $from = null,
+          ?DateTimeInterface $to = null,
+          ?int $count = null,
+          ?AggregationRule $rule = null
+    ): array
+    {
+        $fromTs = $from ? (int)$from->format('Uu') / 1000 : '-';
+        $toTs = $to ? (int)$to->format('Uu') / 1000 : '+';
+
+        $params = ['TS.MRANGE', $fromTs, $toTs];
+        if ($count !== null) {
+            $params[] = 'COUNT';
+            $params[] = $count;
+        }
+
+        return $this->redis->executeCommand(array_merge(
+            $params,
+            $this->getAggregationParams($rule),
+            ['FILTER', $filter->toRedisParams()]
+        ));
     }
 
     /**

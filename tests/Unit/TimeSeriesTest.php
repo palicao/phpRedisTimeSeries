@@ -333,6 +333,28 @@ class TimeSeriesTest extends TestCase
         $this->assertEquals($expected, $response);
     }
 
+    /**
+     * @dataProvider multiRangeDataProvider
+     */
+    public function testMultiRangeRaw(array $params, array $expectedRedisParams): void
+    {
+        $this->redisClientMock
+            ->expects($this->once())
+            ->method('executeCommand')
+            ->with($expectedRedisParams)
+            ->willReturn([
+                ['a', [['a', 'a1']], [[1483300866234, '7']]],
+                ['b', [['a', 'a1']], [[1522923630234, '7.1']]],
+            ]);
+
+        $response = $this->sut->multiRangeRaw(...$params);
+        
+        $this->assertEquals([
+            ['a', [['a', 'a1']], [[1483300866234, '7']]],
+            ['b', [['a', 'a1']], [[1522923630234, '7.1']]],
+        ], $response);
+    }
+
     public function multiRangeDataProvider(): array
     {
         return [

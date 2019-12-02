@@ -109,11 +109,13 @@ to limit the retrieved amount of samples (passing `$count`), and also to pre-agg
 
 See https://oss.redislabs.com/redistimeseries/commands/#tsrange.
 
-### `mrange`
+### `multiRange`
+### `multiRangeRaw`
 
-`TimeSeries::range(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): Sample[]`
+`TimeSeries::multiRange(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): Sample[]`
+`TimeSeries::multiRangeRaw(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): array[]`
 
-Similar to `range`, but instead of querying by key, queries for a specific set of labels specified in `$filter`.
+Similar to `range`, but instead of querying by key, queries for a specific set of labels specified in `$filter`. `multiRangeRaw` will return the raw result from Redis, in order to preserve label information.
 
 See https://oss.redislabs.com/redistimeseries/commands/#tsmrange.
 

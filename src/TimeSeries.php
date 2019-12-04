@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Palicao\PhpRedisTimeSeries;
 
 use DateTimeInterface;
-use RedisException;
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
+use RedisException;
 
 class TimeSeries
 {
@@ -274,11 +274,22 @@ class TimeSeries
         return $samples;
     }
 
-    public function multiRangeRaw(Filter $filter,
-          ?DateTimeInterface $from = null,
-          ?DateTimeInterface $to = null,
-          ?int $count = null,
-          ?AggregationRule $rule = null
+    /**
+     * @param Filter $filter
+     * @param DateTimeInterface|null $from
+     * @param DateTimeInterface|null $to
+     * @param int|null $count
+     * @param AggregationRule|null $rule
+     * @return array The row result from Redis (including labels)
+     * @throws RedisClientException
+     * @throws RedisException
+     */
+    public function multiRangeRaw(
+        Filter $filter,
+        ?DateTimeInterface $from = null,
+        ?DateTimeInterface $to = null,
+        ?int $count = null,
+        ?AggregationRule $rule = null
     ): array
     {
         $fromTs = $from ? (int)$from->format('Uu') / 1000 : '-';
@@ -293,7 +304,8 @@ class TimeSeries
         return $this->redis->executeCommand(array_merge(
             $params,
             $this->getAggregationParams($rule),
-            ['FILTER', $filter->toRedisParams()]
+            ['FILTER'],
+            $filter->toRedisParams()
         ));
     }
 
@@ -319,7 +331,9 @@ class TimeSeries
      */
     public function getLastSamples(Filter $filter): array
     {
-        $results = $this->redis->executeCommand(['TS.MGET', 'FILTER', $filter->toRedisParams()]);
+        $results = $this->redis->executeCommand(
+            array_merge(['TS.MGET', 'FILTER'], $filter->toRedisParams())
+        );
         $samples = [];
         foreach ($results as $result) {
             $samples[] = Sample::createFromTimestamp($result[0], (float)$result[3], (int)$result[2]);
@@ -360,7 +374,9 @@ class TimeSeries
      */
     public function getKeysByFilter(Filter $filter): array
     {
-        return $this->redis->executeCommand(['TS.QUERYINDEX', $filter->toRedisParams()]);
+        return $this->redis->executeCommand(
+            array_merge(['TS.QUERYINDEX'], $filter->toRedisParams())
+        );
     }
 
     private function getRetentionParams(?int $retentionMs = null): array

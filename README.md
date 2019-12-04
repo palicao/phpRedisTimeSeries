@@ -109,8 +109,7 @@ to limit the retrieved amount of samples (passing `$count`), and also to pre-agg
 
 See https://oss.redislabs.com/redistimeseries/commands/#tsrange.
 
-### `multiRange`
-### `multiRangeRaw`
+### `multiRange` and `multiRangeRaw`
 
 `TimeSeries::multiRange(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): Sample[]`
 `TimeSeries::multiRangeRaw(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): array[]`
@@ -175,3 +174,6 @@ label1 = value1 and where label2 is one of 'a', 'b' or 'c'.
 ## Local testing
 For local testing you can use the provided `docker-compose.yml` file, which will create a PHP container (with the redis
 extension pre-installed), and a redis container (with Redis Time Series included).
+
+## Contributors
+Thanks [Mrkisha](https://github.com/Mrkisha) for the precious contributions.

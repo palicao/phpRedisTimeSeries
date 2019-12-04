@@ -299,7 +299,7 @@ class TimeSeriesTest extends TestCase
         $this->redisClientMock
             ->expects($this->once())
             ->method('executeCommand')
-            ->with(['TS.MGET', 'FILTER', 'a=a1'])
+            ->with(['TS.MGET', 'FILTER', ['a=a1']])
             ->willReturn([
                 ['a', [['a', 'a1'], ['b', 'b1']], 1483300866234, '7'],
                 ['b', [['a', 'a1'], ['c', 'c1']], 1522923630234, '7.1'],
@@ -401,9 +401,10 @@ class TimeSeriesTest extends TestCase
         $this->redisClientMock
             ->expects($this->once())
             ->method('executeCommand')
-            ->with(['TS.QUERYINDEX', 'a=a1'])
+            ->with(['TS.QUERYINDEX', ['a=a1']])
             ->willReturn($keys);
         $response = $this->sut->getKeysByFilter(new Filter('a', 'a1'));
+
         $this->assertEquals($keys, $response);
     }
 }

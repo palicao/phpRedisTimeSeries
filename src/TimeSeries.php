@@ -293,7 +293,8 @@ class TimeSeries
         return $this->redis->executeCommand(array_merge(
             $params,
             $this->getAggregationParams($rule),
-            ['FILTER', $filter->toRedisParams()]
+            ['FILTER'],
+            $filter->toRedisParams()
         ));
     }
 

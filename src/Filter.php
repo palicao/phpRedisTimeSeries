@@ -60,7 +60,7 @@ class Filter
         return $this;
     }
 
-    public function toRedisParams(): string
+    public function toRedisParams(): array
     {
         $params = [];
         foreach ($this->filters as $filter) {
@@ -85,6 +85,6 @@ class Filter
                     break;
             }
         }
-        return implode(' ', $params);
+        return $params;
     }
 }

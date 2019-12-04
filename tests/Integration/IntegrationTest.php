@@ -75,13 +75,7 @@ class IntegrationTest extends TestCase
         $filter = new Filter('sensor_id', '2');
         $filter->add('area_id', Filter::OP_EQUALS, '32');
 
-        $range = $this->sut->multiRange(
-            $filter,
-            null,
-            null,
-            null,
-            null
-        );
+        $range = $this->sut->multiRange($filter);
 
         $expectedRange = [
             new Sample('temperature:3:11', 30, new DateTimeImmutable('2019-11-06 20:34:17.103000')),

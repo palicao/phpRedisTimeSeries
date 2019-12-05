@@ -68,7 +68,7 @@ class FilterTest extends TestCase
         $filter->add('lab6', Filter::OP_NOT_IN, ['d', 'e', 'f']);
 
         $result = $filter->toRedisParams();
-        $expected = 'lab1=val1 lab2!=val2 lab3= lab4!= lab5=(a,b,c) lab6!=(d,e,f)';
+        $expected = ['lab1=val1', 'lab2!=val2', 'lab3=', 'lab4!=', 'lab5=(a,b,c)', 'lab6!=(d,e,f)'];
 
         $this->assertEquals($expected, $result);
     }

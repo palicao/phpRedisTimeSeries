@@ -225,8 +225,8 @@ class TimeSeries
         ?AggregationRule $rule = null
     ): array
     {
-        $fromTs = $from ? (int)$from->format('Uu') / 1000 : '-';
-        $toTs = $to ? (int)$to->format('Uu') / 1000 : '+';
+        $fromTs = $from ? DateTimeUtils::timestampWithMsFromDateTime($from) : '-';
+        $toTs = $to ? DateTimeUtils::timestampWithMsFromDateTime($to) : '+';
 
         $params = ['TS.RANGE', $key, $fromTs, $toTs];
         if ($count !== null) {
@@ -292,8 +292,8 @@ class TimeSeries
         ?AggregationRule $rule = null
     ): array
     {
-        $fromTs = $from ? (int)$from->format('Uu') / 1000 : '-';
-        $toTs = $to ? (int)$to->format('Uu') / 1000 : '+';
+        $fromTs = $from ? DateTimeUtils::timestampWithMsFromDateTime($from) : '-';
+        $toTs = $to ? DateTimeUtils::timestampWithMsFromDateTime($to) : '+';
 
         $params = ['TS.MRANGE', $fromTs, $toTs];
         if ($count !== null) {

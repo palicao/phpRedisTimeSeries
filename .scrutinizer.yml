@@ -17,6 +17,7 @@ build:
         php:
           pecl_extensions:
             - redis
+          version: 7.2
         variables:
           REDIS_HOST: localhost
       services:

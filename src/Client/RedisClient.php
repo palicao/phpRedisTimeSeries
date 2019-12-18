@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Palicao\PhpRedisTimeSeries;
+namespace Palicao\PhpRedisTimeSeries\Client;
 
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
 use Redis;
 use RedisException;
 
-class RedisClient
+class RedisClient implements RedisClientInterface
 {
     /** @var Redis */
     private $redis;

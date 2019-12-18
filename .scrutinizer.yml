@@ -2,6 +2,9 @@ build:
   nodes:
 
     analysis:
+      environment:
+        php:
+          version: 7.2
       project_setup:
         override:
           - 'true'
@@ -15,6 +18,7 @@ build:
     coverage:
       environment:
         php:
+          version: 7.2
           pecl_extensions:
             - redis
         variables:
@@ -34,6 +38,7 @@ build:
     psalm:
       environment:
         php:
+          version: 7.2
           pecl_extensions:
             - redis
       tests:

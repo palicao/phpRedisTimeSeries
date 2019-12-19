@@ -2,9 +2,9 @@
 
 Use [Redis Time Series](https://oss.redislabs.com/redistimeseries/) in PHP!
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/palicao/phpRedisTimeSeries/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/palicao/phpRedisTimeSeries/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/palicao/phpRedisTimeSeries/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/palicao/phpRedisTimeSeries/?branch=master)
-[![Build Status](https://scrutinizer-ci.com/g/palicao/phpRedisTimeSeries/badges/build.png?b=master)](https://scrutinizer-ci.com/g/palicao/phpRedisTimeSeries/build-status/master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/fea927b90378dd63a9d8/maintainability)](https://codeclimate.com/github/palicao/phpRedisTimeSeries/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/fea927b90378dd63a9d8/test_coverage)](https://codeclimate.com/github/palicao/phpRedisTimeSeries/test_coverage)
+[![Build Status](https://travis-ci.com/palicao/phpRedisTimeSeries.svg?branch=master)](https://travis-ci.com/palicao/phpRedisTimeSeries)
 [![Latest Stable Version](https://img.shields.io/packagist/v/palicao/php-redis-time-series.svg)](https://packagist.org/packages/palicao/php-redis-time-series)
 
 ## Getting up and running

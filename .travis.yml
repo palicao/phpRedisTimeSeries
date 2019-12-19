@@ -10,7 +10,7 @@ services:
 before_install:
   - docker pull redislabs/redistimeseries:1.0.3
   - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/redistimeseries:1.0.3
-  - yes | pecl install redis
+  - yes | pecl install igbinary redis || true
 
 script:
   - composer install

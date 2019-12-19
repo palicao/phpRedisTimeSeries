@@ -47,7 +47,7 @@ class RedisClient
                 $params->getHost(),
                 $params->getPort(),
                 $params->getTimeout(),
-                null,
+                (PHP_VERSION_ID >= 70300) ? null : '',
                 $params->getRetryInterval(),
                 $params->getReadTimeout()
             );

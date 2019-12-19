@@ -10,7 +10,7 @@ use Palicao\PhpRedisTimeSeries\AggregationRule;
 use Palicao\PhpRedisTimeSeries\Filter;
 use Palicao\PhpRedisTimeSeries\Label;
 use Palicao\PhpRedisTimeSeries\Metadata;
-use Palicao\PhpRedisTimeSeries\RedisClient;
+use Palicao\PhpRedisTimeSeries\Client\RedisClient;
 use Palicao\PhpRedisTimeSeries\Sample;
 use Palicao\PhpRedisTimeSeries\TimeSeries;
 use PHPUnit\Framework\MockObject\MockObject;

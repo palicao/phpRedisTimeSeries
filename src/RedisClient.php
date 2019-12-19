@@ -43,18 +43,16 @@ class RedisClient
                 $params->getReadTimeout()
             );
         } else {
+            /** @psalm-suppress InvalidArgument */
             $result = $this->redis->connect(
                 $params->getHost(),
                 $params->getPort(),
                 $params->getTimeout(),
-                null,
+                (PHP_VERSION_ID >= 70300) ? null : '',
                 $params->getRetryInterval(),
                 $params->getReadTimeout()
             );
         }
-
-        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
-        $this->redis->setOption(8, 1);
 
         if ($result === false) {
             throw new RedisClientException(sprintf(

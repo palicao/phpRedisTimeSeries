@@ -30,4 +30,4 @@ script:
 after_script:
   - docker stop redis
   - docker rm redis
-  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --coverage-input-type clover --exit-code $TRAVIS_TEST_RESULT; fi
+  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --coverage-input-type clover --id $CC_TEST_REPORTER_ID --exit-code $TRAVIS_TEST_RESULT; fi

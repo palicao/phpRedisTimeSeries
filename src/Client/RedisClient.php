@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Palicao\PhpRedisTimeSeries;
+namespace Palicao\PhpRedisTimeSeries\Client;
 
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
 use Redis;
 use RedisException;
 
-class RedisClient
+class RedisClient implements RedisClientInterface
 {
     /** @var Redis */
     private $redis;
@@ -43,18 +43,16 @@ class RedisClient
                 $params->getReadTimeout()
             );
         } else {
+            /** @psalm-suppress InvalidArgument */
             $result = $this->redis->connect(
                 $params->getHost(),
                 $params->getPort(),
                 $params->getTimeout(),
-                null,
+                (PHP_VERSION_ID >= 70300) ? null : '',
                 $params->getRetryInterval(),
                 $params->getReadTimeout()
             );
         }
-
-        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
-        $this->redis->setOption(8, 1);
 
         if ($result === false) {
             throw new RedisClientException(sprintf(

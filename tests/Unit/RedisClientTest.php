@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Palicao\PhpRedisTimeSeries\Tests\Unit;
 
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
-use Palicao\PhpRedisTimeSeries\RedisClient;
-use Palicao\PhpRedisTimeSeries\RedisConnectionParams;
+use Palicao\PhpRedisTimeSeries\Client\RedisClient;
+use Palicao\PhpRedisTimeSeries\Client\RedisConnectionParams;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 use Redis;

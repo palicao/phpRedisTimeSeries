@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Palicao\PhpRedisTimeSeries;
+namespace Palicao\PhpRedisTimeSeries\Client;
 
 class RedisConnectionParams
 {

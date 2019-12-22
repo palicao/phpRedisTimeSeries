@@ -4,18 +4,19 @@ declare(strict_types=1);
 namespace Palicao\PhpRedisTimeSeries;
 
 use DateTimeInterface;
+use Palicao\PhpRedisTimeSeries\Client\RedisClientInterface;
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
 use RedisException;
 
 class TimeSeries
 {
-    /** @var RedisClient */
+    /** @var RedisClientInterface */
     private $redis;
 
     /**
-     * @param RedisClient $redis
+     * @param RedisClientInterface $redis
      */
-    public function __construct(RedisClient $redis)
+    public function __construct(RedisClientInterface $redis)
     {
         $this->redis = $redis;
     }

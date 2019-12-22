@@ -1,0 +1,33 @@
+language: php
+
+php:
+  - 7.2
+  - 7.3
+  - 7.4
+
+env:
+  - REDIS_HOST=localhost
+
+services:
+  - docker
+
+before_install:
+  - docker pull redislabs/redistimeseries:1.0.3
+  - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/redistimeseries:1.0.3
+  - yes | pecl install igbinary redis || true
+  - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter before-build; fi
+
+script:
+  - composer install
+  - ./vendor/bin/phpunit
+  - ./vendor/bin/psalm
+
+after_script:
+  - docker stop redis
+  - docker rm redis
+  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --coverage-input-type clover --id $CC_TEST_REPORTER_ID --exit-code $TRAVIS_TEST_RESULT; fi

@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apt-get -y upgrade && \
     apt-get - dist-upgrade && \
     apt-get update && \
-    apt-get install -yqq zip git
+    apt-get install -yqq zip git wget
 
 RUN pecl install redis && \
     pecl install xdebug && \

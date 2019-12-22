@@ -5,5 +5,9 @@ namespace Palicao\PhpRedisTimeSeries\Client;
 
 interface RedisClientInterface
 {
-    function executeCommand(array $params);
+    /**
+     * @param array $params
+     * @return mixed
+     */
+    public function executeCommand(array $params);
 }

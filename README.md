@@ -2,13 +2,19 @@
 
 Use [Redis Time Series](https://oss.redislabs.com/redistimeseries/) in PHP!
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/fea927b90378dd63a9d8/maintainability)](https://codeclimate.com/github/palicao/phpRedisTimeSeries/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/fea927b90378dd63a9d8/test_coverage)](https://codeclimate.com/github/palicao/phpRedisTimeSeries/test_coverage)
+![Code Climate maintainability](https://img.shields.io/codeclimate/coverage-letter/palicao/phpRedisTimeSeries?label=maintainability&logo=code-climate)
+![Code Climate coverage](https://img.shields.io/codeclimate/coverage/palicao/phpRedisTimeSeries?logo=code-climate)
 [![Build Status](https://travis-ci.com/palicao/phpRedisTimeSeries.svg?branch=master)](https://travis-ci.com/palicao/phpRedisTimeSeries)
 [![Latest Stable Version](https://img.shields.io/packagist/v/palicao/php-redis-time-series.svg)](https://packagist.org/packages/palicao/php-redis-time-series)
+![PHP version](https://img.shields.io/packagist/php-v/palicao/php-redis-time-series/2.0.0)
+![GitHub](https://img.shields.io/github/license/palicao/phpRedisTimeSeries)
 
 ## Getting up and running
 
+### Install
+`composer require palicao/php-redis-time-series`
+
+### Construct
 ```
 $ts = new TimeSeries(
     new RedisClient(

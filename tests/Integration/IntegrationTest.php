@@ -9,11 +9,11 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use Palicao\PhpRedisTimeSeries\AggregationRule;
+use Palicao\PhpRedisTimeSeries\Client\RedisClient;
+use Palicao\PhpRedisTimeSeries\Client\RedisConnectionParams;
 use Palicao\PhpRedisTimeSeries\DateTimeUtils;
 use Palicao\PhpRedisTimeSeries\Filter;
 use Palicao\PhpRedisTimeSeries\Label;
-use Palicao\PhpRedisTimeSeries\Client\RedisClient;
-use Palicao\PhpRedisTimeSeries\Client\RedisConnectionParams;
 use Palicao\PhpRedisTimeSeries\Sample;
 use Palicao\PhpRedisTimeSeries\TimeSeries;
 use PHPUnit\Framework\TestCase;
@@ -156,7 +156,7 @@ class IntegrationTest extends TestCase
     public function testAddAndRetrieveWithDateTimeObjectAsMultiRangeWithMultipleFilters(): void
     {
         $currentDate = new DateTime();
-        $from = $currentDate->sub(new DateInterval('P1D'));
+        $from = (clone $currentDate)->sub(new DateInterval('P1D'));
         $to = $currentDate;
 
         $this->sut->create(

@@ -337,7 +337,12 @@ class TimeSeries
         );
         $samples = [];
         foreach ($results as $result) {
-            $samples[] = Sample::createFromTimestamp($result[0], (float)$result[3], (int)$result[2]);
+            // most recent versions of TS.MGET return results in a nested array
+            if (count($result) === 3) {
+                $samples[] = Sample::createFromTimestamp($result[0], (float)$result[2][1], (int)$result[2][0]);
+            } else {
+                $samples[] = Sample::createFromTimestamp($result[0], (float)$result[3], (int)$result[2]);
+            }
         }
         return $samples;
     }

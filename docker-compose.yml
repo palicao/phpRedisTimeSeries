@@ -11,4 +11,4 @@ services:
       - .:/app
   redis:
     container_name: redis
-    image: redislabs/redistimeseries:1.2.1
+    image: redislabs/redistimeseries:1.2.2

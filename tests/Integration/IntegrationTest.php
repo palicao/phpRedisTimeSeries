@@ -35,8 +35,8 @@ class IntegrationTest extends TestCase
 
     public function testAddAndRetrieveAsRange(): void
     {
-        $from = new DateTimeImmutable('2019-11-06 20:34:17.103000');
-        $to = new DateTimeImmutable('2019-11-06 20:34:17.107000');
+        $from = new DateTimeImmutable('2019-11-06 20:34:17.000');
+        $to = new DateTimeImmutable('2019-11-06 20:34:17.100');
 
         $this->sut->create(
             'temperature:3:11',
@@ -51,12 +51,12 @@ class IntegrationTest extends TestCase
             $from,
             $to,
             null,
-            new AggregationRule(AggregationRule::AGG_AVG, 5)
+            new AggregationRule(AggregationRule::AGG_AVG, 10)
         );
 
         $expectedRange = [
-            new Sample('temperature:3:11', 30, new DateTimeImmutable('2019-11-06 20:34:17.100000')),
-            new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:17.105000'))
+            new Sample('temperature:3:11', 30, new DateTimeImmutable('2019-11-06 20:34:17.000')),
+            new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:17.100'))
         ];
 
         $this->assertEquals($expectedRange, $range);
@@ -64,8 +64,8 @@ class IntegrationTest extends TestCase
 
     public function testAddAndRetrieveAsMultiRangeWithMultipleFilters(): void
     {
-        $from = new DateTimeImmutable('2019-11-06 20:34:17.103000');
-        $to = new DateTimeImmutable('2019-11-06 20:34:17.107000');
+        $from = new DateTimeImmutable('2019-11-06 20:34:17.000');
+        $to = new DateTimeImmutable('2019-11-06 20:34:17.100');
 
         $this->sut->create(
             'temperature:3:11',
@@ -81,8 +81,8 @@ class IntegrationTest extends TestCase
         $range = $this->sut->multiRange($filter);
 
         $expectedRange = [
-            new Sample('temperature:3:11', 30, new DateTimeImmutable('2019-11-06 20:34:17.103000')),
-            new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:17.107000'))
+            new Sample('temperature:3:11', 30, new DateTimeImmutable('2019-11-06 20:34:17.000')),
+            new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:17.100'))
         ];
 
         $this->assertEquals($expectedRange, $range);
@@ -90,8 +90,8 @@ class IntegrationTest extends TestCase
 
     public function testAddAndRetrieveAsLastSamplesWithMultipleFilters(): void
     {
-        $from = new DateTimeImmutable('2019-11-06 20:34:17.103000');
-        $to = new DateTimeImmutable('2019-11-06 20:34:17.107000');
+        $from = new DateTimeImmutable('2019-11-06 20:34:17.000');
+        $to = new DateTimeImmutable('2019-11-06 20:34:18.000');
 
         $this->sut->create(
             'temperature:3:11',
@@ -115,8 +115,8 @@ class IntegrationTest extends TestCase
         $range = $this->sut->getLastSamples($filter);
 
         $expectedResult = [
-            new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:17.107000')),
-            new Sample('temperature:3:12', 42, new DateTimeImmutable('2019-11-06 20:34:17.107000'))
+            new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:18.000')),
+            new Sample('temperature:3:12', 42, new DateTimeImmutable('2019-11-06 20:34:18.000'))
         ];
 
         $this->assertEquals($expectedResult, $range);
@@ -124,8 +124,8 @@ class IntegrationTest extends TestCase
 
     public function testAddAndRetrieveKeysWithMultipleFilters(): void
     {
-        $from = new DateTimeImmutable('2019-11-06 20:34:17.103000');
-        $to = new DateTimeImmutable('2019-11-06 20:34:17.107000');
+        $from = new DateTimeImmutable('2019-11-06 20:34:17.000');
+        $to = new DateTimeImmutable('2019-11-06 20:34:17.100');
 
         $this->sut->create(
             'temperature:3:11',

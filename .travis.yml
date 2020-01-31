@@ -6,21 +6,26 @@ php:
   - 7.4
 
 env:
-  - REDIS_HOST=localhost
+  - REDIS_HOST=localhost REDIS_TIMESERIES_VERSION=1.2.2
+  - REDIS_HOST=localhost REDIS_TIMESERIES_VERSION=edge
+
+jobs:
+  allow_failures:
+    - env: REDIS_HOST=localhost REDIS_TIMESERIES_VERSION=edge
 
 services:
   - docker
 
 before_install:
-  - docker pull redislabs/redistimeseries:1.2.1
-  - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/redistimeseries:1.2.1
+  - docker pull redislabs/redistimeseries:$REDIS_TIMESERIES_VERSION
+  - docker run -d -p 127.0.0.1:6379:6379 --name redis redislabs/redistimeseries:$REDIS_TIMESERIES_VERSION
   - yes | pecl install igbinary redis || true
   - echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
-  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter before-build; fi
+  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$REDIS_TIMESERIES_VERSION" == "1.2.2" ]; then ./cc-test-reporter before-build; fi
 
 script:
   - composer install
@@ -30,4 +35,4 @@ script:
 after_script:
   - docker stop redis
   - docker rm redis
-  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --coverage-input-type clover --id $CC_TEST_REPORTER_ID --exit-code $TRAVIS_TEST_RESULT; fi
+  - if [ $(phpenv version-name) = "7.4" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$REDIS_TIMESERIES_VERSION" == "1.2.2" ]; then ./cc-test-reporter after-build --coverage-input-type clover --id $CC_TEST_REPORTER_ID --exit-code $TRAVIS_TEST_RESULT; fi

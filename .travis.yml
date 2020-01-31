@@ -7,10 +7,21 @@ php:
 
 env:
   - REDIS_HOST=localhost
-  - REDIS_TIMESERIES_VERSION=1.2.1
-  - REDIS_TIMESERIES_VERSION=edge
 
 jobs:
+  include:
+    - php: 7.2
+      env: REDIS_TIMESERIES_VERSION=1.2.1
+    - php: 7.2
+      env: REDIS_TIMESERIES_VERSION=edge
+    - php: 7.3
+      env: REDIS_TIMESERIES_VERSION=1.2.1
+    - php: 7.3
+      env: REDIS_TIMESERIES_VERSION=edge
+    - php: 7.4
+      env: REDIS_TIMESERIES_VERSION=1.2.1
+    - php: 7.4
+      env: REDIS_TIMESERIES_VERSION=edge
   allow_failures:
     - env: REDIS_TIMESERIES_VERSION=edge
 

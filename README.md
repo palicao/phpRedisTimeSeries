@@ -53,9 +53,9 @@ If the key was not explicitly `create`d, it's possible to set retention and labe
 See https://oss.redislabs.com/redistimeseries/commands/#tsadd.
 
 Examples: 
-* `$sample = $ts->add(new Sample('myKey', 32.10), 10, [new Label('myLabel', 'myValue)]);` Adds a sample to `myKey` at 
+* `$sample = $ts->add(new Sample('myKey', 32.10), 10, [new Label('myLabel', 'myValue')]);` Adds a sample to `myKey` at 
 the current timestamp (time of the redis server) and returns it (complete with dateTime).
-* `$sample = $ts->add(new Sample('myKey', 32.10, new DateTimeImmutable()), 10, [new Label('myLabel', 'myValue)]);`
+* `$sample = $ts->add(new Sample('myKey', 32.10, new DateTimeImmutable()), 10, [new Label('myLabel', 'myValue')]);`
 Adds a sample to `myKey` at a given datetime and returns it.
 
 Please notice that RedisTimeSeries only allows to add samples in order (no sample older than the latest is allowed)

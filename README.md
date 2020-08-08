@@ -14,6 +14,11 @@ Use [Redis Time Series](https://oss.redislabs.com/redistimeseries/) in PHP!
 ### Install
 `composer require palicao/php-redis-time-series`
 
+### Requirements
+The library is tested against:
+- PHP 7.2, 7.3 and 7.4
+- RedisTimeSeries 1.2.7 and 1.4.2 (but it should work with any 1.2 and 1.4 version)
+
 ### Construct
 ```
 $ts = new TimeSeries(
@@ -118,6 +123,7 @@ See https://oss.redislabs.com/redistimeseries/commands/#tsrange.
 ### `multiRange` and `multiRangeRaw`
 
 `TimeSeries::multiRange(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): Sample[]`
+
 `TimeSeries::multiRangeRaw(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): array[]`
 
 Similar to `range`, but instead of querying by key, queries for a specific set of labels specified in `$filter`. `multiRangeRaw` will return the raw result from Redis, in order to preserve label information.

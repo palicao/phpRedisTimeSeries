@@ -73,6 +73,9 @@ class RedisClient implements RedisClientInterface
     public function executeCommand(array $params)
     {
         $this->connectIfNeeded();
+        // UNDOCUMENTED FEATURE: option 8 is REDIS_OPT_REPLY_LITERAL
+        $value = (PHP_VERSION_ID < 70300) ? '1' : 1;
+        $this->redis->setOption(8, $value);
         return $this->redis->rawCommand(...$params);
     }
 }

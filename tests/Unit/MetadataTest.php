@@ -24,12 +24,12 @@ class MetadataTest extends TestCase
             null,
             $rules
         );
-        $this->assertEquals(new DateTimeImmutable('2017-01-01T20.01.06.234'), $metadata->getLastTimestamp());
-        $this->assertEquals(1, $metadata->getRetentionTime());
-        $this->assertEquals(2, $metadata->getChunkCount());
-        $this->assertEquals(3, $metadata->getMaxSamplesPerChunk());
-        $this->assertEquals($labels, $metadata->getLabels());
-        $this->assertEquals(null, $metadata->getSourceKey());
-        $this->assertEquals($rules, $metadata->getRules());
+        self::assertEquals(new DateTimeImmutable('2017-01-01T20.01.06.234'), $metadata->getLastTimestamp());
+        self::assertEquals(1, $metadata->getRetentionTime());
+        self::assertEquals(2, $metadata->getChunkCount());
+        self::assertEquals(3, $metadata->getMaxSamplesPerChunk());
+        self::assertEquals($labels, $metadata->getLabels());
+        self::assertEquals(null, $metadata->getSourceKey());
+        self::assertEquals($rules, $metadata->getRules());
     }
 }

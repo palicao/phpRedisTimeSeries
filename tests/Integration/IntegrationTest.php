@@ -15,22 +15,29 @@ use Palicao\PhpRedisTimeSeries\DateTimeUtils;
 use Palicao\PhpRedisTimeSeries\Filter;
 use Palicao\PhpRedisTimeSeries\Label;
 use Palicao\PhpRedisTimeSeries\Sample;
+use Palicao\PhpRedisTimeSeries\SampleWithLabels;
 use Palicao\PhpRedisTimeSeries\TimeSeries;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
 class IntegrationTest extends TestCase
 {
+    private $redisClient;
     private $sut;
 
     public function setUp(): void
     {
-        $host = getenv('REDIS_HOST') ?: 'redis';
+        $host = getenv('REDIS_HOST') ?: 'php-rts-redis';
         $port = getenv('REDIS_PORT') ? (int) getenv('REDIS_PORT') : 6379;
         $connectionParams = new RedisConnectionParams($host, $port);
-        $redisClient = new RedisClient(new Redis(), $connectionParams);
-        $redisClient->executeCommand(['FLUSHDB']);
-        $this->sut = new TimeSeries($redisClient);
+        $this->redisClient = new RedisClient(new Redis(), $connectionParams);
+        $this->redisClient->executeCommand(['FLUSHDB']);
+        $this->sut = new TimeSeries($this->redisClient);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->redisClient->executeCommand(['FLUSHDB']);
     }
 
     public function testAddAndRetrieveAsRange(): void
@@ -59,7 +66,60 @@ class IntegrationTest extends TestCase
             new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:17.100'))
         ];
 
-        $this->assertEquals($expectedRange, $range);
+        self::assertEquals($expectedRange, $range);
+    }
+
+    public function testAddAndRetrieveAsMultirangeWithLabelsReverse(): void
+    {
+        $this->sut->create(
+            'temperature:3:11',
+            60000,
+            [new Label('sensor_id', '3'), new Label('area_id', '11')]
+        );
+        $this->sut->add(
+            new Sample('temperature:3:11', 30, new DateTimeImmutable('2019-11-06 20:34:10.400'))
+        );
+        $this->sut->add(
+            new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:11.400'))
+        );
+
+        $this->sut->create(
+            'temperature:3:12',
+            60000,
+            [new Label('sensor_id', '3'), new Label('area_id', '12')]
+        );
+        $this->sut->add(
+            new Sample('temperature:3:12', 34, new DateTimeImmutable('2019-11-06 20:34:10.000'))
+        );
+        $this->sut->add(
+            new Sample('temperature:3:12', 48, new DateTimeImmutable('2019-11-06 20:34:11.000'))
+        );
+
+        $range = $this->sut->multiRangeWithLabels(
+            new Filter('sensor_id', '3'),
+            null,
+            null,
+            null,
+            new AggregationRule(AggregationRule::AGG_AVG, 60000), // 1-minute aggregation
+            true
+        );
+
+        $expectedRange = [
+            new SampleWithLabels(
+                'temperature:3:11',
+                36, // average between 30 and 42
+                new DateTimeImmutable('2019-11-06 20:34:00.000'),
+                [new Label('sensor_id', '3'), new Label('area_id', '11')]
+            ),
+            new SampleWithLabels(
+                'temperature:3:12',
+                41, //average beween 34 and 48
+                new DateTimeImmutable('2019-11-06 20:34:00.000'),
+                [new Label('sensor_id', '3'), new Label('area_id', '12')]
+            ),
+        ];
+
+        self::assertEquals($expectedRange, $range);
     }
 
     public function testAddAndRetrieveAsMultiRangeWithMultipleFilters(): void
@@ -85,7 +145,7 @@ class IntegrationTest extends TestCase
             new Sample('temperature:3:11', 42, new DateTimeImmutable('2019-11-06 20:34:17.100'))
         ];
 
-        $this->assertEquals($expectedRange, $range);
+        self::assertEquals($expectedRange, $range);
     }
 
     public function testAddAndRetrieveAsLastSamplesWithMultipleFilters(): void
@@ -119,7 +179,7 @@ class IntegrationTest extends TestCase
             new Sample('temperature:3:12', 42, new DateTimeImmutable('2019-11-06 20:34:18.000'))
         ];
 
-        $this->assertEquals($expectedResult, $range);
+        self::assertEquals($expectedResult, $range);
     }
 
     public function testAddAndRetrieveKeysWithMultipleFilters(): void
@@ -150,7 +210,7 @@ class IntegrationTest extends TestCase
 
         $expectedResult = ['temperature:3:11', 'temperature:3:12'];
 
-        $this->assertEquals($expectedResult, $range);
+        self::assertEquals($expectedResult, $range);
     }
 
     public function testAddAndRetrieveWithDateTimeObjectAsMultiRangeWithMultipleFilters(): void
@@ -176,9 +236,8 @@ class IntegrationTest extends TestCase
             Sample::createFromTimestamp('temperature:3:11', (float)42, DateTimeUtils::timestampWithMsFromDateTime(new DateTimeImmutable($to->format('Y-m-d H:i:s.u'))))
         ];
 
-        $this->assertEquals($expectedRange, $range);
+        self::assertEquals($expectedRange, $range);
     }
-
 
     public function testAddAndRetrieveWithDateTimeObjectAsRange(): void
     {
@@ -211,6 +270,6 @@ class IntegrationTest extends TestCase
             ),
         ];
 
-        $this->assertEquals($expectedRange, $range);
+        self::assertEquals($expectedRange, $range);
     }
 }

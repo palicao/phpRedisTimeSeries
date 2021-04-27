@@ -19,6 +19,6 @@ class AggregationRuleTest extends TestCase
     public function testTypesAreCaseInsensitive(): void
     {
         $rule = new AggregationRule('avg', 1000);
-        $this->assertEquals(AggregationRule::AGG_AVG, $rule->getType());
+        self::assertEquals(AggregationRule::AGG_AVG, $rule->getType());
     }
 }

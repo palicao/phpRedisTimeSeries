@@ -70,7 +70,7 @@ class FilterTest extends TestCase
         $result = $filter->toRedisParams();
         $expected = ['lab1=val1', 'lab2!=val2', 'lab3=', 'lab4!=', 'lab5=(a,b,c)', 'lab6!=(d,e,f)'];
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     public function stringOperations(): array

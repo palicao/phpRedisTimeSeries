@@ -8,7 +8,7 @@ use Palicao\PhpRedisTimeSeries\Client\RedisClientInterface;
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
 use RedisException;
 
-class TimeSeries
+final class TimeSeries
 {
     /** @var RedisClientInterface */
     private $redis;
@@ -100,11 +100,16 @@ class TimeSeries
                 $params[] = $sampleParam;
             }
         }
+        /** @var int[] $timestamps */
         $timestamps = $this->redis->executeCommand($params);
         $count = count($timestamps);
         $results = [];
         for ($i = 0; $i < $count; $i++) {
-            $results[] = Sample::createFromTimestamp($samples[$i]->getKey(), $samples[$i]->getValue(), $timestamps[$i]);
+            $results[] = Sample::createFromTimestamp(
+                $samples[$i]->getKey(),
+                $samples[$i]->getValue(),
+                $timestamps[$i]
+            );
         }
         return $results;
     }
@@ -157,10 +162,10 @@ class TimeSeries
         array $labels = []
     ): void
     {
-        $params = [$op, $sample->getKey(), $sample->getValue()];
+        $params = [$op, $sample->getKey(), (string)$sample->getValue()];
         if ($resetMs !== null) {
             $params[] = 'RESET';
-            $params[] = $resetMs;
+            $params[] = (string)$resetMs;
         }
         if ($sample->getDateTime() !== null) {
             $params[] = 'TIMESTAMP';
@@ -214,6 +219,7 @@ class TimeSeries
      * @param DateTimeInterface|null $to
      * @param int|null $count
      * @param AggregationRule|null $rule
+     * @param bool $reverse
      * @return Sample[]
      * @throws RedisClientException
      * @throws RedisException
@@ -223,16 +229,18 @@ class TimeSeries
         ?DateTimeInterface $from = null,
         ?DateTimeInterface $to = null,
         ?int $count = null,
-        ?AggregationRule $rule = null
+        ?AggregationRule $rule = null,
+        bool $reverse = false
     ): array
     {
-        $fromTs = $from ? DateTimeUtils::timestampWithMsFromDateTime($from) : '-';
-        $toTs = $to ? DateTimeUtils::timestampWithMsFromDateTime($to) : '+';
+        $fromTs = $from ? (string)DateTimeUtils::timestampWithMsFromDateTime($from) : '-';
+        $toTs = $to ? (string)DateTimeUtils::timestampWithMsFromDateTime($to) : '+';
 
-        $params = ['TS.RANGE', $key, $fromTs, $toTs];
+        $command = $reverse ? 'TS.REVRANGE' : 'TS.RANGE';
+        $params = [$command, $key, $fromTs, $toTs];
         if ($count !== null) {
             $params[] = 'COUNT';
-            $params[] = $count;
+            $params[] = (string)$count;
         }
 
         $rawResults = $this->redis->executeCommand(array_merge($params, $this->getAggregationParams($rule)));
@@ -251,6 +259,7 @@ class TimeSeries
      * @param DateTimeInterface|null $to
      * @param int|null $count
      * @param AggregationRule|null $rule
+     * @param bool $reverse
      * @return Sample[]
      * @throws RedisClientException
      * @throws RedisException
@@ -260,10 +269,11 @@ class TimeSeries
         ?DateTimeInterface $from = null,
         ?DateTimeInterface $to = null,
         ?int $count = null,
-        ?AggregationRule $rule = null
+        ?AggregationRule $rule = null,
+        bool $reverse = false
     ): array
     {
-        $results = $this->multiRangeRaw($filter, $from, $to, $count, $rule);
+        $results = $this->multiRangeRaw($filter, $from, $to, $count, $rule, $reverse);
 
         $samples = [];
         foreach ($results as $groupByKey) {
@@ -281,33 +291,82 @@ class TimeSeries
      * @param DateTimeInterface|null $to
      * @param int|null $count
      * @param AggregationRule|null $rule
-     * @return array The row result from Redis (including labels)
+     * @param bool $reverse
+     * @return SampleWithLabels[]
      * @throws RedisClientException
      * @throws RedisException
      */
-    public function multiRangeRaw(
+    public function multiRangeWithLabels(
         Filter $filter,
         ?DateTimeInterface $from = null,
         ?DateTimeInterface $to = null,
         ?int $count = null,
-        ?AggregationRule $rule = null
+        ?AggregationRule $rule = null,
+        bool $reverse = false
     ): array
     {
-        $fromTs = $from ? DateTimeUtils::timestampWithMsFromDateTime($from) : '-';
-        $toTs = $to ? DateTimeUtils::timestampWithMsFromDateTime($to) : '+';
+        $results = $this->multiRangeRaw($filter, $from, $to, $count, $rule, $reverse, true);
 
-        $params = ['TS.MRANGE', $fromTs, $toTs];
+        $samples = [];
+        foreach ($results as $groupByKey) {
+            $key = $groupByKey[0];
+            $labels = [];
+            foreach ($groupByKey[1] as $label) {
+                $labels[] = new Label($label[0], $label[1]);
+            }
+            foreach ($groupByKey[2] as $result) {
+                $samples[] = SampleWithLabels::createFromTimestampAndLabels(
+                    $key,
+                    (float)$result[1],
+                    $result[0],
+                    $labels
+                );
+            }
+        }
+        return $samples;
+    }
+
+    /**
+     * @param Filter $filter
+     * @param DateTimeInterface|null $from
+     * @param DateTimeInterface|null $to
+     * @param int|null $count
+     * @param AggregationRule|null $rule
+     * @param bool $reverse
+     * @param bool $withLabels
+     * @return array
+     * @throws RedisException
+     */
+    private function multiRangeRaw(
+        Filter $filter,
+        ?DateTimeInterface $from = null,
+        ?DateTimeInterface $to = null,
+        ?int $count = null,
+        ?AggregationRule $rule = null,
+        bool $reverse = false,
+        bool $withLabels = false
+    ): array
+    {
+        $fromTs = $from ? (string)DateTimeUtils::timestampWithMsFromDateTime($from) : '-';
+        $toTs = $to ? (string)DateTimeUtils::timestampWithMsFromDateTime($to) : '+';
+
+        $command = $reverse ? 'TS.MREVRANGE' : 'TS.MRANGE';
+        $params = [$command, $fromTs, $toTs];
+
         if ($count !== null) {
             $params[] = 'COUNT';
-            $params[] = $count;
+            $params[] = (string)$count;
         }
 
-        return $this->redis->executeCommand(array_merge(
-            $params,
-            $this->getAggregationParams($rule),
-            ['FILTER'],
-            $filter->toRedisParams()
-        ));
+        $params = array_merge($params, $this->getAggregationParams($rule));
+
+        if ($withLabels) {
+            $params[] = 'WITHLABELS';
+        }
+
+        $params = array_merge($params, ['FILTER'], $filter->toRedisParams());
+
+        return $this->redis->executeCommand($params);
     }
 
     /**
@@ -385,17 +444,21 @@ class TimeSeries
         );
     }
 
+    /**
+     * @param int|null $retentionMs
+     * @return string[]
+     */
     private function getRetentionParams(?int $retentionMs = null): array
     {
         if ($retentionMs === null) {
             return [];
         }
-        return ['RETENTION', $retentionMs];
+        return ['RETENTION', (string)$retentionMs];
     }
 
     /**
      * @param Label ...$labels
-     * @return array
+     * @return string[]
      */
     private function getLabelsParams(Label ...$labels): array
     {
@@ -413,11 +476,15 @@ class TimeSeries
         return $params;
     }
 
+    /**
+     * @param AggregationRule|null $rule
+     * @return string[]
+     */
     private function getAggregationParams(?AggregationRule $rule = null): array
     {
         if ($rule === null) {
             return [];
         }
-        return ['AGGREGATION', $rule->getType(), $rule->getTimeBucketMs()];
+        return ['AGGREGATION', $rule->getType(), (string)$rule->getTimeBucketMs()];
     }
 }

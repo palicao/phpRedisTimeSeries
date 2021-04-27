@@ -40,7 +40,7 @@ class TimeSeriesTest extends TestCase
     public function testCreate($params, $expectedParams): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with($expectedParams);
         $this->sut->create(...$params);
@@ -58,7 +58,7 @@ class TimeSeriesTest extends TestCase
     public function testAlter(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.ALTER', 'a', 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']);
         $this->sut->alter(
@@ -74,13 +74,13 @@ class TimeSeriesTest extends TestCase
     public function testAdd($params, $expectedParams): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with($expectedParams)
             ->willReturn(1483300866234);
         $addedSample = $this->sut->add(...$params);
         $expectedSample = new Sample('a', 10.1, new DateTimeImmutable('2017-01-01T20.01.06.234'));
-        $this->assertEquals($expectedSample, $addedSample);
+        self::assertEquals($expectedSample, $addedSample);
     }
 
     public function addDataProvider(): array
@@ -108,7 +108,7 @@ class TimeSeriesTest extends TestCase
     public function testAddMany(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.MADD', 'a', '*', 10.1, 'b', 1483300866234, 1.0])
             ->willReturn([1483300866233, 1483300866234]);
@@ -120,23 +120,23 @@ class TimeSeriesTest extends TestCase
             new Sample('a', 10.1, new DateTimeImmutable('2017-01-01T20.01.06.233')),
             new Sample('b', 1.0, new DateTimeImmutable('2017-01-01T20.01.06.234'))
         ];
-        $this->assertEquals($expectedSamples, $addedSamples);
+        self::assertEquals($expectedSamples, $addedSamples);
     }
 
     public function testAddManyEmpty(): void
     {
         $this->redisClientMock
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('executeCommand')
             ->willReturn([]);
         $addedSamples = $this->sut->addMany([]);
-        $this->assertEquals([], $addedSamples);
+        self::assertEquals([], $addedSamples);
     }
 
     public function testIncrementBy(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.INCRBY', 'a', 10.1, 'RESET', 10, 'RETENTION', 20, 'LABELS', 'l1', 'v1', 'l2', 'v2']);
         $this->sut->incrementBy(
@@ -150,7 +150,7 @@ class TimeSeriesTest extends TestCase
     public function testDecrementBy(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.DECRBY', 'a', 10.1, 'RESET', 10, 'TIMESTAMP', 1483300866234, 'RETENTION', 20, 'LABELS', 'l1', 'v1', 'l2', 'v2'])
             ->willReturn(1483300866234);
@@ -165,7 +165,7 @@ class TimeSeriesTest extends TestCase
     public function testCreateRule(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.CREATERULE', 'a', 'b', 'AGGREGATION', 'AVG', 100])
             ->willReturn(1483300866234);
@@ -175,7 +175,7 @@ class TimeSeriesTest extends TestCase
     public function testDeleteRule(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.DELETERULE', 'a', 'b'])
             ->willReturn(1483300866234);
@@ -188,7 +188,7 @@ class TimeSeriesTest extends TestCase
     public function testRange(array $params, array $expectedRedisParam): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with($expectedRedisParam)
             ->willReturn([[1483300866234, '9.1'], [1522923630234, '9.2']]);
@@ -198,7 +198,7 @@ class TimeSeriesTest extends TestCase
             new Sample('a', 9.2, new DateTimeImmutable('2018-04-05T10.20.30.234'))
         ];
 
-        $this->assertEquals($expectedSamples, $returnedSamples);
+        self::assertEquals($expectedSamples, $returnedSamples);
     }
 
     public function rangeDataProvider(): array
@@ -247,7 +247,7 @@ class TimeSeriesTest extends TestCase
     public function testInfo(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.INFO', 'a'])
             ->willReturn([
@@ -277,27 +277,27 @@ class TimeSeriesTest extends TestCase
             ['aa' => new AggregationRule(AggregationRule::AGG_AVG, 10)]
         );
 
-        $this->assertEquals($expected, $returned);
+        self::assertEquals($expected, $returned);
     }
 
 
     public function testGetLastSample(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.GET', 'a'])
             ->willReturn([1483300866234, '7']);
         $response = $this->sut->getLastSample('a');
         $expected = new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234'));
-        $this->assertEquals($expected, $response);
+        self::assertEquals($expected, $response);
     }
 
 
     public function testGetLastSamples(): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.MGET', 'FILTER', 'a=a1'])
             ->willReturn([
@@ -309,7 +309,7 @@ class TimeSeriesTest extends TestCase
             new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234')),
             new Sample('b', 7.1, new DateTimeImmutable('2018-04-05T10.20.30.234')),
         ];
-        $this->assertEquals($expected, $response);
+        self::assertEquals($expected, $response);
     }
 
     /**
@@ -318,7 +318,7 @@ class TimeSeriesTest extends TestCase
     public function testMultiRange(array $params, array $expectedRedisParams): void
     {
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with($expectedRedisParams)
             ->willReturn([
@@ -330,29 +330,7 @@ class TimeSeriesTest extends TestCase
             new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234')),
             new Sample('b', 7.1, new DateTimeImmutable('2018-04-05T10.20.30.234')),
         ];
-        $this->assertEquals($expected, $response);
-    }
-
-    /**
-     * @dataProvider multiRangeDataProvider
-     */
-    public function testMultiRangeRaw(array $params, array $expectedRedisParams): void
-    {
-        $this->redisClientMock
-            ->expects($this->once())
-            ->method('executeCommand')
-            ->with($expectedRedisParams)
-            ->willReturn([
-                ['a', [['a', 'a1']], [[1483300866234, '7']]],
-                ['b', [['a', 'a1']], [[1522923630234, '7.1']]],
-            ]);
-
-        $response = $this->sut->multiRangeRaw(...$params);
-        
-        $this->assertEquals([
-            ['a', [['a', 'a1']], [[1483300866234, '7']]],
-            ['b', [['a', 'a1']], [[1522923630234, '7.1']]],
-        ], $response);
+        self::assertEquals($expected, $response);
     }
 
     public function multiRangeDataProvider(): array
@@ -399,11 +377,11 @@ class TimeSeriesTest extends TestCase
     {
         $keys = ['a', 'b'];
         $this->redisClientMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('executeCommand')
             ->with(['TS.QUERYINDEX', 'a=a1'])
             ->willReturn($keys);
         $response = $this->sut->getKeysByFilter(new Filter('a', 'a1'));
-        $this->assertEquals($keys, $response);
+        self::assertEquals($keys, $response);
     }
 }

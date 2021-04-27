@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    name: PHP ${{ matrix.php-versions }}
+    name: PHP ${{ matrix.php-versions }} - RedisTimeSeries ${{ matrix.rts-versions }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -53,3 +53,5 @@ jobs:
         env:
           REDIS_HOST: localhost
           REDIS_TIMESERIES_VERSION: ${{ matrix.rts-versions }}
+      - name: Run psalm
+        run: vendor/bin/psalm

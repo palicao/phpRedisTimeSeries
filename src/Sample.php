@@ -5,16 +5,17 @@ namespace Palicao\PhpRedisTimeSeries;
 
 use DateTimeInterface;
 
+/** @psalm-immutable */
 class Sample
 {
     /** @var string */
-    private $key;
+    protected $key;
 
     /** @var float */
-    private $value;
+    protected $value;
 
     /** @var DateTimeInterface|null */
-    private $dateTime;
+    protected $dateTime;
 
     public function __construct(string $key, float $value, ?DateTimeInterface $dateTime = null)
     {
@@ -44,18 +45,22 @@ class Sample
     }
 
     /**
-     * @return int|string
+     * @return string
+     * @psalm-external-mutation-free
      */
-    public function getTimestampWithMs()
+    public function getTimestampWithMs(): string
     {
         if ($this->dateTime === null) {
             return '*';
         }
-        return DateTimeUtils::timestampWithMsFromDateTime($this->dateTime);
+        return (string)DateTimeUtils::timestampWithMsFromDateTime($this->dateTime);
     }
 
+    /**
+     * @return string[]
+     */
     public function toRedisParams(): array
     {
-        return [$this->getKey(), $this->getTimestampWithMs(), $this->getValue()];
+        return [$this->getKey(), $this->getTimestampWithMs(), (string) $this->getValue()];
     }
 }

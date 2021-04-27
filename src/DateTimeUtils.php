@@ -7,7 +7,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Palicao\PhpRedisTimeSeries\Exception\TimestampParsingException;
 
-class DateTimeUtils
+final class DateTimeUtils
 {
     public static function dateTimeFromTimestampWithMs(int $timestamp) : DateTimeInterface
     {

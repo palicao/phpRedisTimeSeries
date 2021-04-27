@@ -5,7 +5,8 @@ namespace Palicao\PhpRedisTimeSeries;
 
 use DateTimeInterface;
 
-class Metadata
+/** @psalm-immutable */
+final class Metadata
 {
     /** @var DateTimeInterface */
     private $lastTimestamp;
@@ -45,8 +46,7 @@ class Metadata
         array $labels = [],
         ?string $sourceKey = null,
         array $rules = []
-    )
-    {
+    ) {
         $this->lastTimestamp = $lastTimestamp;
         $this->retentionTime = $retentionTime;
         $this->chunkCount = $chunkCount;
@@ -56,6 +56,16 @@ class Metadata
         $this->rules = $rules;
     }
 
+    /**
+     * @param int $lastTimestamp
+     * @param int $retentionTime
+     * @param int $chunkCount
+     * @param int $maxSamplesPerChunk
+     * @param Label[] $labels
+     * @param string|null $sourceKey
+     * @param AggregationRule[] $rules
+     * @return static
+     */
     public static function fromRedis(
         int $lastTimestamp,
         int $retentionTime = 0,

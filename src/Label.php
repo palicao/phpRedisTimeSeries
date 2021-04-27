@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries;
 
-class Label
+/** @psalm-immutable */
+final class Label
 {
     /** @var string */
     private $key;

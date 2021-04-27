@@ -5,7 +5,7 @@ namespace Palicao\PhpRedisTimeSeries;
 
 use Palicao\PhpRedisTimeSeries\Exception\InvalidFilterOperationException;
 
-class Filter
+final class Filter
 {
     public const OP_EQUALS = 0;
     public const OP_NOT_EQUALS = 1;
@@ -23,7 +23,10 @@ class Filter
         self::OP_NOT_IN
     ];
 
-    /** @var array */
+    /**
+     * @var array
+     * @psalm-var array<array{string, int, string|array|null}>
+     */
     private $filters = [];
 
     public function __construct(string $label, string $value)
@@ -69,9 +72,11 @@ class Filter
         foreach ($this->filters as $filter) {
             switch ($filter[1]) {
                 case self::OP_EQUALS:
+                    assert(is_string($filter[2]));
                     $params[] = $filter[0] . '=' . $filter[2];
                     break;
                 case self::OP_NOT_EQUALS:
+                    assert(is_string($filter[2]));
                     $params[] = $filter[0] . '!=' . $filter[2];
                     break;
                 case self::OP_EXISTS:
@@ -81,9 +86,11 @@ class Filter
                     $params[] = $filter[0] . '!=';
                     break;
                 case self::OP_IN:
+                    assert(is_array($filter[2]));
                     $params[] = $filter[0] . '=(' . implode(',', $filter[2]) . ')';
                     break;
                 case self::OP_NOT_IN:
+                    assert(is_array($filter[2]));
                     $params[] = $filter[0] . '!=(' . implode(',', $filter[2]) . ')';
                     break;
             }

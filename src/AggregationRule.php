@@ -5,7 +5,8 @@ namespace Palicao\PhpRedisTimeSeries;
 
 use Palicao\PhpRedisTimeSeries\Exception\InvalidAggregationException;
 
-class AggregationRule
+/** @psalm-immutable */
+final class AggregationRule
 {
     public const AGG_AVG = 'AVG';
     public const AGG_SUM = 'SUM';

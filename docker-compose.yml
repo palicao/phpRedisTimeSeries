@@ -1,14 +1,13 @@
 version: '3'
 
 services:
-  php:
-    container_name: php
+  php-rts-php:
     build:
       dockerfile: Dockerfile
       context: .
     entrypoint: sleep infinity
     volumes:
       - .:/app
-  redis:
-    container_name: redis
-    image: redislabs/redistimeseries:1.4.2
+      - ./docker/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+  php-rts-redis:
+    image: redislabs/redistimeseries:1.4.8

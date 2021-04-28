@@ -41,8 +41,6 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          # Use composer.json for key, if composer.lock is not committed.
-          # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Install dependencies
@@ -55,3 +53,9 @@ jobs:
           REDIS_TIMESERIES_VERSION: ${{ matrix.rts-versions }}
       - name: Run psalm
         run: vendor/bin/psalm
+      - name: Export coverage
+        uses: paambaati/codeclimate-action@v2.2.4
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        with:
+          coverageLocations: build/logs/clover.xml:clover

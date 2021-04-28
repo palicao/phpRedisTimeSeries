@@ -1,4 +1,4 @@
 /.idea/
 /vendor/
-/build/
-.phpunit.result.cache
+/clover.xml
+/.phpunit.result.cache

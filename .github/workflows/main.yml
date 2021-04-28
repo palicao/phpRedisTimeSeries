@@ -55,7 +55,7 @@ jobs:
         run: vendor/bin/psalm
       - name: Export coverage
         uses: paambaati/codeclimate-action@v2.7.5
-        if: ${{ matrix.php-version }} == '7.4' && ${{ matrix.rts-version }} == '1.4.8'
+        if: ${{ matrix.php-version == '7.4' && matrix.rts-version == '1.4.8' }}
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:

@@ -13,15 +13,15 @@ on:
 
 jobs:
   build:
-    name: PHP ${{ matrix.php-versions }} - RedisTimeSeries ${{ matrix.rts-versions }}
+    name: PHP ${{ matrix.php-version }} - RedisTimeSeries ${{ matrix.rts-version }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.2', '7.3', '7.4']
-        rts-versions: ['1.4.8', 'edge']
+        php-version: ['7.2', '7.3', '7.4']
+        rts-version: ['1.4.8', 'edge']
     services:
       redis:
-        image: redislabs/redistimeseries:${{ matrix.rts-versions }}
+        image: redislabs/redistimeseries:${{ matrix.rts-version }}
         ports: 
           - 6379:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -31,7 +31,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php-version }}
           extensions: redis
           coverage: xdebug
       - name: Get composer cache directory
@@ -41,8 +41,6 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          # Use composer.json for key, if composer.lock is not committed.
-          # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Install dependencies
@@ -52,6 +50,13 @@ jobs:
         run: vendor/bin/phpunit --coverage-text
         env:
           REDIS_HOST: localhost
-          REDIS_TIMESERIES_VERSION: ${{ matrix.rts-versions }}
+          REDIS_TIMESERIES_VERSION: ${{ matrix.rts-version }}
       - name: Run psalm
         run: vendor/bin/psalm
+      - name: Export coverage
+        uses: paambaati/codeclimate-action@v2.7.5
+        if: ${{ matrix.php-version == '7.4' && matrix.rts-version == '1.4.8' }}
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        with:
+          coverageLocations: clover.xml:clover

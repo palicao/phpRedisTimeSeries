@@ -3,11 +3,14 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries\Client;
 
+use RedisException;
+
 interface RedisClientInterface
 {
     /**
-     * @param array $params
+     * @param string[] $params
      * @return mixed
+     * @throws RedisException
      */
     public function executeCommand(array $params);
 }

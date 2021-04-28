@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Palicao\PhpRedisTimeSeries\Client;
 
-class RedisConnectionParams
+final class RedisConnectionParams
 {
     /** @var bool */
     private $persistentConnection;
@@ -23,11 +23,30 @@ class RedisConnectionParams
     /** @var float */
     private $readTimeout;
 
-    public function __construct(string $host = '127.0.0.1', int $port = 6379)
-    {
+    /** @var string|null */
+    private $username;
+
+    /** @var string|null */
+    private $password;
+
+    /**
+     * RedisConnectionParams constructor.
+     * @param string $host
+     * @param int $port
+     * @param string|null $username
+     * @param string|null $password
+     */
+    public function __construct(
+        string $host = '127.0.0.1',
+        int $port = 6379,
+        ?string $username = null,
+        ?string $password = null
+    ) {
         $this->persistentConnection = false;
         $this->host = $host;
         $this->port = $port;
+        $this->username = $username;
+        $this->password = $password;
         $this->timeout = 0;
         $this->retryInterval = 0;
         $this->readTimeout = 0.0;
@@ -105,5 +124,15 @@ class RedisConnectionParams
     public function getReadTimeout(): float
     {
         return $this->readTimeout;
+    }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
     }
 }

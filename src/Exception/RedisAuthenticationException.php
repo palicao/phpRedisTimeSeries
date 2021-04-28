@@ -5,6 +5,6 @@ namespace Palicao\PhpRedisTimeSeries\Exception;
 
 use RuntimeException;
 
-final class RedisClientException extends RuntimeException
+final class RedisAuthenticationException extends RuntimeException
 {
 }

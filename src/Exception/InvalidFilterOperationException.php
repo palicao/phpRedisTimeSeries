@@ -5,6 +5,6 @@ namespace Palicao\PhpRedisTimeSeries\Exception;
 
 use InvalidArgumentException;
 
-class InvalidFilterOperationException extends InvalidArgumentException
+final class InvalidFilterOperationException extends InvalidArgumentException
 {
 }

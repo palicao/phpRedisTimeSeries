@@ -17,7 +17,9 @@ Use [Redis Time Series](https://oss.redislabs.com/redistimeseries/) in PHP!
 ### Requirements
 The library is tested against:
 - PHP 7.2, 7.3 and 7.4
-- RedisTimeSeries 1.2.7 and 1.4.2 (but it should work with any 1.2 and 1.4 version)
+- RedisTimeSeries 1.4.8 (but it should work with any 1.4 version)
+
+In order to use RedisTimeSeries 1.2 please use version 2.1.1 of this library.
 
 ### Construct
 ```
@@ -113,20 +115,26 @@ See https://oss.redislabs.com/redistimeseries/commands/#tsdeleterule.
 
 ### `range`
 
-`TimeSeries::range(string $key, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): Sample[]`
+`TimeSeries::range(string $key, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null, bool $reverse = false): Sample[]`
 
 Retrieves samples from a key. It's possible to limit the query in a given time frame (passing `$from` and `$to`),
 to limit the retrieved amount of samples (passing `$count`), and also to pre-aggregate the results using a `$rule`.
 
+The flag `$reverse` will return the results in reverse time order.
+
 See https://oss.redislabs.com/redistimeseries/commands/#tsrange.
 
-### `multiRange` and `multiRangeRaw`
+### `multiRange` and `multiRangeWithLabels`
 
-`TimeSeries::multiRange(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): Sample[]`
+`TimeSeries::multiRange(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null, bool $reverse = false): Sample[]`
 
-`TimeSeries::multiRangeRaw(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null): array[]`
+`TimeSeries::multiRangeWithLabels(Filter $filter, ?DateTimeInterface $from = null, ?DateTimeInterface $to = null, ?int $count = null, ?AggregationRule $rule = null, bool $reverse = false): SampleWithLabels[]`
 
-Similar to `range`, but instead of querying by key, queries for a specific set of labels specified in `$filter`. `multiRangeRaw` will return the raw result from Redis, in order to preserve label information.
+Similar to `range`, but instead of querying by key, queries for a specific set of labels specified in `$filter`.
+
+`multiRangeWithLabels` will return an array of `SampleWithLabels` instead of simple `Sample`s.
+
+The flag `$reverse` will return the results in reverse time order.
 
 See https://oss.redislabs.com/redistimeseries/commands/#tsmrange.
 

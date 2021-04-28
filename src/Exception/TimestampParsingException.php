@@ -5,6 +5,6 @@ namespace Palicao\PhpRedisTimeSeries\Exception;
 
 use InvalidArgumentException;
 
-class TimestampParsingException extends InvalidArgumentException
+final class TimestampParsingException extends InvalidArgumentException
 {
 }

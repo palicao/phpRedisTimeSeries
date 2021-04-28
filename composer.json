@@ -1,5 +1,6 @@
 {
     "name": "palicao/php-redis-time-series",
+    "description": "Use Redis Time Series in PHP",
     "license": "MIT",
     "authors": [
         {
@@ -23,6 +24,6 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^8.3",
-        "vimeo/psalm": "^3.5"
+        "vimeo/psalm": "^4.7"
     }
 }

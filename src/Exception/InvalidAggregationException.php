@@ -5,6 +5,6 @@ namespace Palicao\PhpRedisTimeSeries\Exception;
 
 use RuntimeException;
 
-class InvalidAggregationException extends RuntimeException
+final class InvalidAggregationException extends RuntimeException
 {
 }

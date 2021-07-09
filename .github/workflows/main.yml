@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         php-version: ['7.2', '7.3', '7.4', '8.0']
-        rts-version: ['1.4.8']
+        rts-version: ['1.4.10']
     services:
       redis:
         image: redislabs/redistimeseries:${{ matrix.rts-version }}
@@ -60,7 +60,7 @@ jobs:
         run: vendor/bin/psalm
       - name: Export coverage
         uses: paambaati/codeclimate-action@v2.7.5
-        if: ${{ matrix.php-version == '7.4' && matrix.rts-version == '1.4.8' }}
+        if: ${{ matrix.php-version == '8.0' && matrix.rts-version == '1.4.10' }}
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:

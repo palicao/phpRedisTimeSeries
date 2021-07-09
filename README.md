@@ -16,8 +16,8 @@ Use [Redis Time Series](https://oss.redislabs.com/redistimeseries/) in PHP!
 
 ### Requirements
 The library is tested against:
-- PHP 7.2, 7.3 and 7.4
-- RedisTimeSeries 1.4.8 (but it should work with any 1.4 version)
+- PHP 7.2, 7.3, 7.4, 8.0
+- RedisTimeSeries 1.4.10 (but it should work with any 1.4 version)
 
 In order to use RedisTimeSeries 1.2 please use version 2.1.1 of this library.
 

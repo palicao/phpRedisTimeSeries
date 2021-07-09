@@ -17,9 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['7.2', '7.3', '7.4', '8.0', '8.1']
-        rts-version: ['1.4.8', 'edge']
-    continue-on-error: ${{ matrix.rts-version == 'edge' }}
+        php-version: ['7.2', '7.3', '7.4', '8.0']
+        rts-version: ['1.4.8']
     services:
       redis:
         image: redislabs/redistimeseries:${{ matrix.rts-version }}

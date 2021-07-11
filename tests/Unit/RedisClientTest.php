@@ -77,13 +77,6 @@ class RedisClientTest extends TestCase
     {
         $redisMock = $this->createMock(Redis::class);
         $redisMock->expects(self::once())->method('isConnected')->willReturn(false);
-        $redisMock->expects(self::once())->method('connect')->with(
-            '127.0.0.1',
-            6379,
-            0,
-            0,
-            0.0
-        );
         $redisMock->expects(self::once())
             ->method('auth')
             ->with('pass');
@@ -96,13 +89,6 @@ class RedisClientTest extends TestCase
     {
         $redisMock = $this->createMock(Redis::class);
         $redisMock->expects(self::once())->method('isConnected')->willReturn(false);
-        $redisMock->expects(self::once())->method('connect')->with(
-            '127.0.0.1',
-            6379,
-            0,
-            0,
-            0.0
-        );
         $redisMock->expects(self::exactly(2))
             ->method('rawCommand')
             ->withConsecutive(

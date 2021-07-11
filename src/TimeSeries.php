@@ -5,11 +5,29 @@ namespace Palicao\PhpRedisTimeSeries;
 
 use DateTimeInterface;
 use Palicao\PhpRedisTimeSeries\Client\RedisClientInterface;
+use Palicao\PhpRedisTimeSeries\Exception\InvalidDuplicatePolicyException;
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
 use RedisException;
 
 final class TimeSeries
 {
+    public const DUPLICATE_POLICY_BLOCK = 'BLOCK';
+    public const DUPLICATE_POLICY_FIRST = 'FIRST';
+    public const DUPLICATE_POLICY_LAST = 'LAST';
+    public const DUPLICATE_POLICY_MIN = 'MIN';
+    public const DUPLICATE_POLICY_MAX = 'MAX';
+    public const DUPLICATE_POLICY_SUM = 'SUM';
+
+    private const DUPLICATE_POLICIES = [
+        self::DUPLICATE_POLICY_BLOCK,
+        self::DUPLICATE_POLICY_FIRST,
+        self::DUPLICATE_POLICY_LAST,
+        self::DUPLICATE_POLICY_MIN,
+        self::DUPLICATE_POLICY_MAX,
+        self::DUPLICATE_POLICY_SUM
+    ];
+
+
     /** @var RedisClientInterface */
     private $redis;
 
@@ -27,15 +45,44 @@ final class TimeSeries
      * @param string $key
      * @param int|null $retentionMs
      * @param Label[] $labels
+     * @param bool $uncompressed
+     * @param int|null $chunkSize
+     * @param string|null $duplicatePolicy
      * @return void
-     * @throws RedisClientException
      * @throws RedisException
      */
-    public function create(string $key, ?int $retentionMs = null, array $labels = []): void
+    public function create(
+        string $key,
+        ?int $retentionMs = null,
+        array $labels = [],
+        bool $uncompressed = false,
+        ?int $chunkSize = null,
+        ?string $duplicatePolicy = null
+    ): void
     {
+        $params = [];
+
+        if ($uncompressed === true) {
+            $params[] = 'UNCOMPRESSED';
+        }
+
+        if ($chunkSize !== null) {
+            $params[] = 'CHUNK_SIZE';
+            $params[] = (string) $chunkSize;
+        }
+
+        if ($duplicatePolicy !== null) {
+            if (!in_array($duplicatePolicy, self::DUPLICATE_POLICIES)) {
+                throw new InvalidDuplicatePolicyException(sprintf("Duplicate policy %s is invalid", $duplicatePolicy));
+            }
+            $params[] = 'DUPLICATE_POLICY';
+            $params[] = $duplicatePolicy;
+        }
+
         $this->redis->executeCommand(array_merge(
             ['TS.CREATE', $key],
             $this->getRetentionParams($retentionMs),
+            $params,
             $this->getLabelsParams(...$labels)
         ));
     }
@@ -65,15 +112,44 @@ final class TimeSeries
      * @param Sample $sample
      * @param int|null $retentionMs
      * @param Label[] $labels
+     * @param bool $uncompressed
+     * @param int|null $chunkSize
+     * @param string|null $duplicatePolicy
      * @return Sample
-     * @throws RedisClientException
      * @throws RedisException
      */
-    public function add(Sample $sample, ?int $retentionMs = null, array $labels = []): Sample
+    public function add(
+        Sample $sample,
+        ?int $retentionMs = null,
+        array $labels = [],
+        bool $uncompressed = false,
+        ?int $chunkSize = null,
+        ?string $duplicatePolicy = null
+    ): Sample
     {
+        $params = [];
+
+        if ($uncompressed === true) {
+            $params[] = 'UNCOMPRESSED';
+        }
+
+        if ($chunkSize !== null) {
+            $params[] = 'CHUNK_SIZE';
+            $params[] = (string) $chunkSize;
+        }
+
+        if ($duplicatePolicy !== null) {
+            if (!in_array($duplicatePolicy, self::DUPLICATE_POLICIES)) {
+                throw new InvalidDuplicatePolicyException(sprintf("Duplicate policy %s is invalid", $duplicatePolicy));
+            }
+            $params[] = 'ON_DUPLICATE';
+            $params[] = $duplicatePolicy;
+        }
+        
         $timestamp = (int)$this->redis->executeCommand(array_merge(
             ['TS.ADD'],
             $sample->toRedisParams(),
+            $params,
             $this->getRetentionParams($retentionMs),
             $this->getLabelsParams(...$labels)
         ));

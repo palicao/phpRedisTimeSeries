@@ -37,7 +37,7 @@ class TimeSeriesTest extends TestCase
     /**
      * @dataProvider createDataProvider
      */
-    public function testCreate($params, $expectedParams): void
+    public function testCreate(array $params, array $expectedParams): void
     {
         $this->redisClientMock
             ->expects(self::once())
@@ -49,7 +49,40 @@ class TimeSeriesTest extends TestCase
     public function createDataProvider(): array
     {
         return [
-            'full' => [['a', 10, [new Label('l1', 'v1'), new Label('l2', 'v2')]], ['TS.CREATE', 'a', 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']],
+            'full' => [
+                [
+                    'a',
+                    10,
+                    [new Label('l1', 'v1'), new Label('l2', 'v2')],
+                    true,
+                    10000,
+                    TimeSeries::DUPLICATE_POLICY_SUM
+                ],
+                [
+                    'TS.CREATE', 
+                    'a',
+                    'RETENTION',
+                    10, 
+                    'UNCOMPRESSED', 
+                    'CHUNK_SIZE', 
+                    '10000', 
+                    'DUPLICATE_POLICY', 
+                    'SUM',
+                    'LABELS',
+                    'l1',
+                    'v1', 
+                    'l2',
+                    'v2'
+                ],
+            ],
+            'most common' => [
+                [
+                    'a',
+                    10, 
+                    [new Label('l1', 'v1'), new Label('l2', 'v2')]
+                ],
+                ['TS.CREATE', 'a', 'RETENTION', 10, 'LABELS', 'l1', 'v1', 'l2', 'v2']
+            ],
             'no labels' => [['a', 10], ['TS.CREATE', 'a', 'RETENTION', 10]],
             'minimal' => [['a'], ['TS.CREATE', 'a']]
         ];
@@ -71,7 +104,7 @@ class TimeSeriesTest extends TestCase
     /**
      * @dataProvider addDataProvider
      */
-    public function testAdd($params, $expectedParams): void
+    public function testAdd(array $params, array $expectedParams): void
     {
         $this->redisClientMock
             ->expects(self::once())
@@ -279,8 +312,7 @@ class TimeSeriesTest extends TestCase
 
         self::assertEquals($expected, $returned);
     }
-
-
+    
     public function testGetLastSample(): void
     {
         $this->redisClientMock
@@ -292,7 +324,6 @@ class TimeSeriesTest extends TestCase
         $expected = new Sample('a', 7.0, new DateTimeImmutable('2017-01-01T20.01.06.234'));
         self::assertEquals($expected, $response);
     }
-
 
     public function testGetLastSamples(): void
     {

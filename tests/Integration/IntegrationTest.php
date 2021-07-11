@@ -69,6 +69,26 @@ class IntegrationTest extends TestCase
         self::assertEquals($expectedRange, $range);
     }
 
+    public function testAddAndRetrieveWithDuplicatePolicySum(): void
+    {
+        $dt = new DateTimeImmutable('2019-11-06 20:34:17.000');
+        $this->sut->create(
+            'temperature:3:11',
+            6000,
+            [new Label('sensor_id', '2'), new Label('area_id', '32')],
+            false,
+            null,
+            TimeSeries::DUPLICATE_POLICY_SUM
+        );
+        
+        $this->sut->add(new Sample('temperature:3:11', 10.0, $dt));
+        $this->sut->add(new Sample('temperature:3:11', 20.0, $dt));
+        
+        $result = $this->sut->range('temperature:3:11', $dt, $dt);
+        
+        self::assertEquals([new Sample('temperature:3:11', 30.0, $dt)], $result);
+    }
+
     public function testAddAndRetrieveAsMultirangeWithLabelsReverse(): void
     {
         $this->sut->create(

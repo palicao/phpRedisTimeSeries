@@ -13,7 +13,9 @@ final class DateTimeUtils
     {
         $dateTime = DateTimeImmutable::createFromFormat('U.u', sprintf('%.03f', $timestamp / 1000));
         if ($dateTime === false) {
+            // @codeCoverageIgnoreStart
             throw new TimestampParsingException(sprintf("Unable to parse timestamp: %d", $timestamp));
+            // @codeCoverageIgnoreEnd
         }
         return $dateTime;
     }

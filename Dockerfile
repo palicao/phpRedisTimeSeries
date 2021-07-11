@@ -2,6 +2,8 @@ FROM php:7.4-cli
 ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 
+ENV XDEBUG_MODE=coverage
+
 RUN apt-get -y upgrade && \
     apt-get - dist-upgrade && \
     apt-get update && \

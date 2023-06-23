@@ -9,7 +9,7 @@ use Palicao\PhpRedisTimeSeries\Exception\InvalidDuplicatePolicyException;
 use Palicao\PhpRedisTimeSeries\Exception\RedisClientException;
 use RedisException;
 
-final class TimeSeries
+class TimeSeries
 {
     public const DUPLICATE_POLICY_BLOCK = 'BLOCK';
     public const DUPLICATE_POLICY_FIRST = 'FIRST';
@@ -18,7 +18,7 @@ final class TimeSeries
     public const DUPLICATE_POLICY_MAX = 'MAX';
     public const DUPLICATE_POLICY_SUM = 'SUM';
 
-    private const DUPLICATE_POLICIES = [
+    protected const DUPLICATE_POLICIES = [
         self::DUPLICATE_POLICY_BLOCK,
         self::DUPLICATE_POLICY_FIRST,
         self::DUPLICATE_POLICY_LAST,
@@ -29,7 +29,7 @@ final class TimeSeries
 
 
     /** @var RedisClientInterface */
-    private $redis;
+    protected $redis;
 
     /**
      * @param RedisClientInterface $redis

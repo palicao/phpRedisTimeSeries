@@ -491,20 +491,40 @@ final class TimeSeries
     public function info(string $key): Metadata
     {
         $result = $this->redis->executeCommand(['TS.INFO', $key]);
+        $result = $this->parseInfo($result);
 
         $labels = [];
-        foreach ($result[9] as $strLabel) {
-            $labels[] = new Label($strLabel[0], $strLabel[1]);
+        foreach ($result['labels'] as $label) {
+            $labels[] = new Label($label[0], $label[1]);
         }
 
-        $sourceKey = $result[11] === false ? null : $result[11];
+        $sourceKey = $result['sourceKey'] === false ? null : $result['sourceKey'];
 
         $rules = [];
-        foreach ($result[13] as $rule) {
+        foreach ($result['rules'] as $rule) {
             $rules[$rule[0]] = new AggregationRule($rule[2], $rule[1]);
         }
 
-        return Metadata::fromRedis($result[1], $result[3], $result[5], $result[7], $labels, $sourceKey, $rules);
+        return Metadata::fromRedis(
+            $result['lastTimestamp'],
+            $result['retentionTime'],
+            $result['chunkCount'],
+            $result['maxSamplesPerChunk'],
+            $labels,
+            $sourceKey,
+            $rules
+        );
+    }
+
+    protected function parseInfo(array $info)
+    {
+        $chunks = array_chunk($result, 2);
+        $props = [];
+        foreach ($chunks as $chunk) {
+            $props[$chunk[0]] = $chunk[1];
+        }
+
+        return $props;
     }
 
     /**

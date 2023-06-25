@@ -518,7 +518,7 @@ final class TimeSeries
 
     protected function parseInfo(array $info)
     {
-        $chunks = array_chunk($result, 2);
+        $chunks = array_chunk($info, 2);
         $props = [];
         foreach ($chunks as $chunk) {
             $props[$chunk[0]] = $chunk[1];

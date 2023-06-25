@@ -509,7 +509,7 @@ final class TimeSeries
             $result['lastTimestamp'],
             $result['retentionTime'],
             $result['chunkCount'],
-            $result['maxSamplesPerChunk'],
+            $result['chunkSize'],
             $labels,
             $sourceKey,
             $rules
@@ -523,6 +523,13 @@ final class TimeSeries
         foreach ($chunks as $chunk) {
             $props[$chunk[0]] = $chunk[1];
         }
+
+        // maxSamplesPerChunk has been replaced with chunkSize in 1.4.4
+        // https://github.com/RedisTimeSeries/RedisTimeSeries/commit/5896a509e5ec30929c04cd96a7f8b2c9e9651ed9
+        $props['chunkSize'] = isset($props['chunkSize'])
+            ? $props['chunkSize']
+            : $props['maxSamplesPerChunk']
+            ;
 
         return $props;
     }

@@ -516,7 +516,7 @@ final class TimeSeries
         );
     }
 
-    protected function parseInfo(array $info)
+    protected function parseInfo(array $info): array
     {
         $chunks = array_chunk($info, 2);
         $props = [];

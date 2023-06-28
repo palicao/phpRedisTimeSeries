@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['7.2', '7.3', '7.4', '8.0']
-        rts-version: ['1.4.10']
+        php-version: ['7.4', '8.0', '8.1', '8.2']
+        rts-version: ['1.4.13', '1.6.19', '1.8.10']
     services:
       redis:
         image: redislabs/redistimeseries:${{ matrix.rts-version }}
@@ -58,10 +58,10 @@ jobs:
           REDIS_TIMESERIES_VERSION: ${{ matrix.rts-version }}
       - name: Run psalm
         run: vendor/bin/psalm
-      - name: Export coverage
-        uses: paambaati/codeclimate-action@v2.7.5
-        if: ${{ matrix.php-version == '7.4' && matrix.rts-version == '1.4.10' }}
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-        with:
-          coverageLocations: clover.xml:clover
+
+
+
+
+
+
+

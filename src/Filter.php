@@ -80,10 +80,10 @@ final class Filter
                     $params[] = $filter[0] . '!=' . $filter[2];
                     break;
                 case self::OP_EXISTS:
-                    $params[] = $filter[0] . '=';
+                    $params[] = $filter[0] . '!=';
                     break;
                 case self::OP_NOT_EXISTS:
-                    $params[] = $filter[0] . '!=';
+                    $params[] = $filter[0] . '=';
                     break;
                 case self::OP_IN:
                     assert(is_array($filter[2]));

@@ -5,9 +5,11 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
+      args:
+        PHP_VERSION: ${PHP_VERSION-7.4}
     entrypoint: sleep infinity
     volumes:
       - .:/app
       - ./docker/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
   php-rts-redis:
-    image: redislabs/redistimeseries:1.4.10
+    image: redislabs/redistimeseries:${RTS_VERSION-1.4.13}

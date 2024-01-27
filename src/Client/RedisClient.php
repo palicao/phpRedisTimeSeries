@@ -90,8 +90,8 @@ class RedisClient implements RedisClientInterface
     private function authenticate(?string $username, ?string $password): void
     {
         try {
-            if ($password) {
-                if ($username) {
+            if ($password !== null) {
+                if ($username !== null) {
                     // Calling auth() with an array throws a TypeError in some cases
                     /**
                      * @noinspection PhpMethodParametersCountMismatchInspection
@@ -104,13 +104,16 @@ class RedisClient implements RedisClientInterface
                 }
                 if ($result === false) {
                     throw new RedisAuthenticationException(sprintf(
-                        'Failure authenticating user %s', $username ?: 'default'
+                        'Failure authenticating user %s',
+                        $username === null ? 'default' : $username
                     ));
                 }
             }
         } /** @noinspection PhpRedundantCatchClauseInspection */ catch (RedisException $e) {
             throw new RedisAuthenticationException(sprintf(
-                'Failure authenticating user %s: %s', $username ?: 'default', $e->getMessage()
+                'Failure authenticating user %s: %s',
+                $username === null ? 'default' : $username,
+                $e->getMessage()
             ));
         }
     }

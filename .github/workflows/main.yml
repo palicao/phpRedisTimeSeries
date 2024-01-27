@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         php-version: ['7.4', '8.0', '8.1', '8.2']
-        rts-version: ['1.4.13', '1.6.19', '1.8.10']
+        rts-version: ['1.4.13', '1.6.19', '1.8.12']
     steps:
       - uses: actions/checkout@v3
       - uses: adambirds/docker-compose-action@v1.3.0

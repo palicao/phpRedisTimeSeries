@@ -14,8 +14,9 @@ RUN apt-get -y upgrade && \
     apt-get update && \
     apt-get install -yqq zip git wget
 
-RUN pecl install igbinary redis ${XDEBUG_PACKAGE} && \
-    docker-php-ext-enable igbinary redis xdebug
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions igbinary redis xdebug
 
 RUN wget https://github.com/composer/composer/releases/download/${COMPOSER_VERSION}/composer.phar -q && \
     mv composer.phar /usr/bin/composer && \

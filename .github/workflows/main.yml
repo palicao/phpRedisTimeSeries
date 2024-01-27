@@ -25,7 +25,10 @@ jobs:
         with:
           down-flags: "--volumes"
           test-container: php-rts-php
-          test-command: "./vendor/bin/phpunit --coverage-text && vendor/bin/psalm"
+          test-command: "composer install --no-progress --prefer-dist --optimize-autoloader && ./vendor/bin/phpunit --coverage-text && vendor/bin/psalm"
+        env:
+          PHP_VERSION: ${{ matrix.php-version }}
+
 #      - name: Checkout
 #        uses: actions/checkout@v2
 #      - name: Setup PHP

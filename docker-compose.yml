@@ -5,6 +5,8 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
+      args:
+        PHP_VERSION: ${PHP_VERSION}
     entrypoint: sleep infinity
     volumes:
       - .:/app
